@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<settings>
+  <action setid="1">
+    <distancevalue>xy</distancevalue>
+    <cooldownvalue>yes</cooldownvalue>
+    <actionone>1</actionone>
+    <actiontwo>2</actiontwo>
+    <predictionvalue>1.00</predictionvalue>
+    <predictionerrorvalue>1</predictionerrorvalue>
+    <fitnessvalue>1.00old</fitnessvalue>
+  </action>
+</settings>
