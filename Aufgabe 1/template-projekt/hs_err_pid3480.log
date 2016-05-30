@@ -1,0 +1,248 @@
+#
+# A fatal error has been detected by the Java Runtime Environment:
+#
+#  EXCEPTION_ACCESS_VIOLATION (0xc0000005) at pc=0x69413f01, pid=3480, tid=2876
+#
+# JRE version: Java(TM) SE Runtime Environment (8.0_91-b14) (build 1.8.0_91-b14)
+# Java VM: Java HotSpot(TM) Client VM (25.91-b14 mixed mode, sharing windows-x86 )
+# Problematic frame:
+# C  [bwapi_bridge2_5.dll+0x23f01]
+#
+# Failed to write core dump. Minidumps are not enabled by default on client versions of Windows
+#
+# If you would like to submit a bug report, please visit:
+#   http://bugreport.java.com/bugreport/crash.jsp
+# The crash happened outside the Java Virtual Machine in native code.
+# See problematic frame for where to report the bug.
+#
+
+---------------  T H R E A D  ---------------
+
+Current thread (0x02404400):  JavaThread "main" [_thread_in_native, id=2876, stack(0x00280000,0x002d0000)]
+
+siginfo: ExceptionCode=0xc0000005, reading address 0x00000114
+
+Registers:
+EAX=0x00000000, EBX=0x14e2a568, ECX=0x005f5050, EDX=0x14e2dc68
+ESP=0x002cde80, EBP=0x002cde98, ESI=0x14e2a568, EDI=0x02404400
+EIP=0x69413f01, EFLAGS=0x00010212
+
+Top of Stack: (sp=0x002cde80)
+0x002cde80:   02404400 14e2a568 14e2a568 02504854
+0x002cde90:   00000000 00000001 002cdee0 0250d353
+0x002cdea0:   02404540 002cdef8 005f5050 02404400
+0x002cdeb0:   00000000 15259430 00000000 002cdec8
+0x002cdec0:   002cdec0 00000000 002cdef8 14e2dc68
+0x002cded0:   00000000 14e2a568 00000000 002cdef0
+0x002cdee0:   002cdf1c 025047b4 00000000 02509d06
+0x002cdef0:   005f5050 02404400 04738f38 002cdefc 
+
+Instructions: (pc=0x69413f01)
+0x69413ee1:   5e 33 cc e8 53 19 17 00 8b e5 5d c2 10 00 cc 55
+0x69413ef1:   8b ec 83 e4 f8 83 ec 0c 8b 4d 10 53 56 57 8b 01
+0x69413f01:   ff 90 14 01 00 00 83 ec 18 99 8b cc 89 44 24 28
+0x69413f11:   8b da 6a 0c c7 41 14 0f 00 00 00 c7 41 10 00 00 
+
+
+Register to memory mapping:
+
+EAX=0x00000000 is an unknown value
+EBX={method} {0x14e2a56c} 'self_native' '(J)Lbwapi/Player;' in 'bwapi/Game'
+ECX=0x005f5050 is an unknown value
+EDX=0x14e2dc68 is pointing into metadata
+ESP=0x002cde80 is pointing into the stack for thread: 0x02404400
+EBP=0x002cde98 is pointing into the stack for thread: 0x02404400
+ESI={method} {0x14e2a56c} 'self_native' '(J)Lbwapi/Player;' in 'bwapi/Game'
+EDI=0x02404400 is a thread
+
+
+Stack: [0x00280000,0x002d0000],  sp=0x002cde80,  free space=311k
+Native frames: (J=compiled Java code, j=interpreted, Vv=VM code, C=native code)
+C  [bwapi_bridge2_5.dll+0x23f01]
+j  bwapi.Game.self_native(J)Lbwapi/Player;+0
+j  bwapi.Game.self()Lbwapi/Player;+5
+j  VultureAI.onStart()V+27
+j  bwapi.AIModule.onStart()V+11
+v  ~StubRoutines::call_stub
+V  [jvm.dll+0x1594e5]
+V  [jvm.dll+0x21f0ae]
+V  [jvm.dll+0x15957e]
+V  [jvm.dll+0xdb72b]
+V  [jvm.dll+0xde6bc]
+C  [bwapi_bridge2_5.dll+0x1b20d]
+C  [bwapi_bridge2_5.dll+0x750d3]
+j  bwapi.Mirror.startGame()V+0
+j  VultureAI.run()V+15
+j  VultureAI.main([Ljava/lang/String;)V+7
+v  ~StubRoutines::call_stub
+V  [jvm.dll+0x1594e5]
+V  [jvm.dll+0x21f0ae]
+V  [jvm.dll+0x15957e]
+V  [jvm.dll+0xdb4f7]
+V  [jvm.dll+0xe3a8f]
+C  [javaw.exe+0x229a]
+C  [javaw.exe+0xaebf]
+C  [javaw.exe+0xaf49]
+C  [kernel32.dll+0x133ca]
+C  [ntdll.dll+0x39ed2]
+C  [ntdll.dll+0x39ea5]
+C  0x00000000
+
+Java frames: (J=compiled Java code, j=interpreted, Vv=VM code)
+j  bwapi.Game.self_native(J)Lbwapi/Player;+0
+j  bwapi.Game.self()Lbwapi/Player;+5
+j  VultureAI.onStart()V+27
+j  bwapi.AIModule.onStart()V+11
+v  ~StubRoutines::call_stub
+j  bwapi.Mirror.startGame()V+0
+j  VultureAI.run()V+15
+j  VultureAI.main([Ljava/lang/String;)V+7
+v  ~StubRoutines::call_stub
+
+---------------  P R O C E S S  ---------------
+
+Java Threads: ( => current thread )
+  0x024c1800 JavaThread "Service Thread" daemon [_thread_blocked, id=3204, stack(0x15c20000,0x15c70000)]
+  0x0249a400 JavaThread "C1 CompilerThread0" daemon [_thread_blocked, id=2756, stack(0x15b40000,0x15b90000)]
+  0x02498400 JavaThread "Attach Listener" daemon [_thread_blocked, id=2832, stack(0x15ad0000,0x15b20000)]
+  0x0248b800 JavaThread "Signal Dispatcher" daemon [_thread_blocked, id=4072, stack(0x15a30000,0x15a80000)]
+  0x0248a000 JavaThread "Finalizer" daemon [_thread_blocked, id=3756, stack(0x15790000,0x157e0000)]
+  0x0242e400 JavaThread "Reference Handler" daemon [_thread_blocked, id=3948, stack(0x15040000,0x15090000)]
+=>0x02404400 JavaThread "main" [_thread_in_native, id=2876, stack(0x00280000,0x002d0000)]
+
+Other Threads:
+  0x02429800 VMThread [stack: 0x002d0000,0x00320000] [id=228]
+  0x024cbc00 WatcherThread [stack: 0x15d30000,0x15d80000] [id=3872]
+
+VM state:not at safepoint (normal execution)
+
+VM Mutex/Monitor currently owned by a thread: None
+
+Heap:
+ def new generation   total 4928K, used 1997K [0x04600000, 0x04b50000, 0x09b50000)
+  eden space 4416K,  45% used [0x04600000, 0x047f35c8, 0x04a50000)
+  from space 512K,   0% used [0x04a50000, 0x04a50000, 0x04ad0000)
+  to   space 512K,   0% used [0x04ad0000, 0x04ad0000, 0x04b50000)
+ tenured generation   total 10944K, used 0K [0x09b50000, 0x0a600000, 0x14600000)
+   the space 10944K,   0% used [0x09b50000, 0x09b50000, 0x09b50200, 0x0a600000)
+ Metaspace       used 403K, capacity 2600K, committed 2624K, reserved 4480K
+
+Card table byte_map: [0x004e0000,0x00570000] byte_map_base: 0x004bd000
+
+Polling page: 0x00180000
+
+CodeCache: size=32768Kb used=703Kb max_used=703Kb free=32064Kb
+ bounds [0x02500000, 0x025b0000, 0x04500000]
+ total_blobs=183 nmethods=34 adapters=80
+ compilation: enabled
+
+Compilation events (10 events):
+Event: 10.491 Thread 0x0249a400   30             sun.nio.cs.SingleByte$Encoder::encodeArrayLoop (236 bytes)
+Event: 10.492 Thread 0x0249a400 nmethod 30 0x025ad048 code [0x025ad360, 0x025addec]
+Event: 10.492 Thread 0x0249a400   31             java.lang.Long::valueOf (36 bytes)
+Event: 10.493 Thread 0x0249a400 nmethod 31 0x025af3c8 code [0x025af4d0, 0x025af640]
+Event: 10.493 Thread 0x0249a400   32             java.lang.Long::<init> (10 bytes)
+Event: 10.493 Thread 0x0249a400 nmethod 32 0x025af788 code [0x025af880, 0x025af910]
+Event: 10.493 Thread 0x0249a400   33             java.lang.Long::hashCode (8 bytes)
+Event: 10.493 Thread 0x0249a400 nmethod 33 0x025af948 code [0x025afa40, 0x025afae0]
+Event: 10.493 Thread 0x0249a400   34             java.lang.Long::hashCode (8 bytes)
+Event: 10.493 Thread 0x0249a400 nmethod 34 0x025afb48 code [0x025afc40, 0x025afce0]
+
+GC Heap History (0 events):
+No events
+
+Deoptimization events (0 events):
+No events
+
+Internal exceptions (10 events):
+Event: 21.146 Thread 0x02404400 Exception <a 'java/lang/NullPointerException'> (0x047f0f60) thrown at [C:\re\workspace\8-2-build-windows-i586-cygwin\jdk8u91\6644\hotspot\src\share\vm\interpreter\linkResolver.cpp, line 1178]
+Event: 21.159 Thread 0x02404400 Exception <a 'java/lang/NullPointerException'> (0x047f1160) thrown at [C:\re\workspace\8-2-build-windows-i586-cygwin\jdk8u91\6644\hotspot\src\share\vm\interpreter\linkResolver.cpp, line 1178]
+Event: 21.163 Thread 0x02404400 Exception <a 'java/lang/NullPointerException'> (0x047f1360) thrown at [C:\re\workspace\8-2-build-windows-i586-cygwin\jdk8u91\6644\hotspot\src\share\vm\interpreter\linkResolver.cpp, line 1178]
+Event: 21.174 Thread 0x02404400 Exception <a 'java/lang/NullPointerException'> (0x047f1560) thrown at [C:\re\workspace\8-2-build-windows-i586-cygwin\jdk8u91\6644\hotspot\src\share\vm\interpreter\linkResolver.cpp, line 1178]
+Event: 21.190 Thread 0x02404400 Exception <a 'java/lang/NullPointerException'> (0x047f1760) thrown at [C:\re\workspace\8-2-build-windows-i586-cygwin\jdk8u91\6644\hotspot\src\share\vm\interpreter\linkResolver.cpp, line 1178]
+Event: 21.193 Thread 0x02404400 Exception <a 'java/lang/NullPointerException'> (0x047f1960) thrown at [C:\re\workspace\8-2-build-windows-i586-cygwin\jdk8u91\6644\hotspot\src\share\vm\interpreter\linkResolver.cpp, line 1178]
+Event: 21.205 Thread 0x02404400 Exception <a 'java/lang/NullPointerException'> (0x047f1b60) thrown at [C:\re\workspace\8-2-build-windows-i586-cygwin\jdk8u91\6644\hotspot\src\share\vm\interpreter\linkResolver.cpp, line 1178]
+Event: 21.222 Thread 0x02404400 Exception <a 'java/lang/NullPointerException'> (0x047f1d60) thrown at [C:\re\workspace\8-2-build-windows-i586-cygwin\jdk8u91\6644\hotspot\src\share\vm\interpreter\linkResolver.cpp, line 1178]
+Event: 21.225 Thread 0x02404400 Exception <a 'java/lang/NullPointerException'> (0x047f1f60) thrown at [C:\re\workspace\8-2-build-windows-i586-cygwin\jdk8u91\6644\hotspot\src\share\vm\interpreter\linkResolver.cpp, line 1178]
+Event: 21.254 Thread 0x02404400 Exception <a 'java/lang/NullPointerException'> (0x047f2160) thrown at [C:\re\workspace\8-2-build-windows-i586-cygwin\jdk8u91\6644\hotspot\src\share\vm\interpreter\linkResolver.cpp, line 1178]
+
+Events (10 events):
+Event: 8.598 loading class bwapi/Game
+Event: 8.598 loading class bwapi/Game done
+Event: 10.485 loading class Vulture
+Event: 10.485 loading class Vulture done
+Event: 10.486 loading class XCS
+Event: 10.486 loading class XCS done
+Event: 10.486 loading class PopulationSet
+Event: 10.486 loading class PopulationSet done
+Event: 10.487 loading class PopulationEntry
+Event: 10.487 loading class PopulationEntry done
+
+
+Dynamic libraries:
+0x00fc0000 - 0x00ff3000 	C:\Program Files (x86)\Java\jre1.8.0_91\bin\javaw.exe
+0x77960000 - 0x77ae0000 	C:\Windows\SysWOW64\ntdll.dll
+0x76510000 - 0x76620000 	C:\Windows\syswow64\kernel32.dll
+0x764c0000 - 0x76506000 	C:\Windows\syswow64\KERNELBASE.dll
+0x76980000 - 0x76a20000 	C:\Windows\syswow64\ADVAPI32.dll
+0x76740000 - 0x767ec000 	C:\Windows\syswow64\msvcrt.dll
+0x75760000 - 0x75779000 	C:\Windows\SysWOW64\sechost.dll
+0x76fe0000 - 0x770d0000 	C:\Windows\syswow64\RPCRT4.dll
+0x754c0000 - 0x75520000 	C:\Windows\syswow64\SspiCli.dll
+0x754b0000 - 0x754bc000 	C:\Windows\syswow64\CRYPTBASE.dll
+0x75660000 - 0x75760000 	C:\Windows\syswow64\USER32.dll
+0x76d20000 - 0x76db0000 	C:\Windows\syswow64\GDI32.dll
+0x76a30000 - 0x76a3a000 	C:\Windows\syswow64\LPK.dll
+0x770d0000 - 0x7716d000 	C:\Windows\syswow64\USP10.dll
+0x74580000 - 0x7471e000 	C:\Windows\WinSxS\x86_microsoft.windows.common-controls_6595b64144ccf1df_6.0.7601.17514_none_41e6975e2bd6f2b2\COMCTL32.dll
+0x77480000 - 0x774d7000 	C:\Windows\syswow64\SHLWAPI.dll
+0x75780000 - 0x757e0000 	C:\Windows\system32\IMM32.DLL
+0x767f0000 - 0x768bc000 	C:\Windows\syswow64\MSCTF.dll
+0x744b0000 - 0x7456f000 	C:\Program Files (x86)\Java\jre1.8.0_91\bin\msvcr100.dll
+0x6aa00000 - 0x6adca000 	C:\Program Files (x86)\Java\jre1.8.0_91\bin\client\jvm.dll
+0x74570000 - 0x74577000 	C:\Windows\system32\WSOCK32.dll
+0x75620000 - 0x75655000 	C:\Windows\syswow64\WS2_32.dll
+0x76a20000 - 0x76a26000 	C:\Windows\syswow64\NSI.dll
+0x74160000 - 0x74192000 	C:\Windows\system32\WINMM.dll
+0x73f90000 - 0x73f99000 	C:\Windows\system32\VERSION.dll
+0x76d10000 - 0x76d15000 	C:\Windows\syswow64\PSAPI.DLL
+0x744a0000 - 0x744ac000 	C:\Program Files (x86)\Java\jre1.8.0_91\bin\verify.dll
+0x74470000 - 0x74491000 	C:\Program Files (x86)\Java\jre1.8.0_91\bin\java.dll
+0x74450000 - 0x74463000 	C:\Program Files (x86)\Java\jre1.8.0_91\bin\zip.dll
+0x75870000 - 0x764ba000 	C:\Windows\syswow64\SHELL32.dll
+0x771d0000 - 0x7732c000 	C:\Windows\syswow64\ole32.dll
+0x74140000 - 0x7414b000 	C:\Windows\system32\profapi.dll
+0x693f0000 - 0x69676000 	C:\Users\Starcraft-VM\Desktop\StarcraftUebung\Aufgabe 1\template-projekt\bwapi_bridge2_5.dll
+0x15980000 - 0x159e7000 	C:\Users\Starcraft-VM\Desktop\StarcraftUebung\Aufgabe 1\template-projekt\libgmp-10.dll
+0x6f540000 - 0x6f59e000 	C:\Users\Starcraft-VM\Desktop\StarcraftUebung\Aufgabe 1\template-projekt\libmpfr-4.dll
+0x73c70000 - 0x73ce1000 	C:\Program Files (x86)\Java\jre1.8.0_91\bin\MSVCP120.dll
+0x6afd0000 - 0x6b0be000 	C:\Program Files (x86)\Java\jre1.8.0_91\bin\MSVCR120.dll
+0x69050000 - 0x6913b000 	C:\Windows\system32\dbghelp.dll
+
+VM Arguments:
+jvm_args: -Dfile.encoding=Cp1252 
+java_command: VultureAI
+java_class_path (initial): C:\Users\Starcraft-VM\Desktop\StarcraftUebung\Aufgabe 1\template-projekt\bin;C:\Users\Starcraft-VM\Desktop\StarcraftUebung\Aufgabe 1\template-projekt\lib\bwmirror_v2_5.jar;C:\Users\Starcraft-VM\Desktop\StarcraftUebung\Aufgabe 1\template-projekt\jdom-2.0.6-contrib.jar;C:\Users\Starcraft-VM\Desktop\StarcraftUebung\Aufgabe 1\template-projekt\jdom-2.0.6-javadoc.jar;C:\Users\Starcraft-VM\Desktop\StarcraftUebung\Aufgabe 1\template-projekt\jdom-2.0.6-junit.jar;C:\Users\Starcraft-VM\Desktop\StarcraftUebung\Aufgabe 1\template-projekt\jdom-2.0.6-sources.jar;C:\Users\Starcraft-VM\Desktop\StarcraftUebung\Aufgabe 1\template-projekt\jdom-2.0.6.jar
+Launcher Type: SUN_STANDARD
+
+Environment Variables:
+PATH=C:/Program Files (x86)/Java/jre1.8.0_91/bin/client;C:/Program Files (x86)/Java/jre1.8.0_91/bin;C:/Program Files (x86)/Java/jre1.8.0_91/lib/i386;C:\ProgramData\Oracle\Java\javapath;C:\Windows\system32;C:\Windows;C:\Windows\System32\Wbem;C:\Windows\System32\WindowsPowerShell\v1.0\;C:\Program Files\TortoiseGit\bin;C:\Program Files\Git\cmd;C:\Program Files (x86)\Eclipse;
+USERNAME=Starcraft-VM
+OS=Windows_NT
+PROCESSOR_IDENTIFIER=Intel64 Family 6 Model 69 Stepping 1, GenuineIntel
+
+
+
+---------------  S Y S T E M  ---------------
+
+OS: Windows 7 , 64 bit Build 7601 (6.1.7601.17514)
+
+CPU:total 1 (1 cores per cpu, 1 threads per core) family 6 model 69 stepping 1, cmov, cx8, fxsr, mmx, sse, sse2, sse3, ssse3, sse4.1, sse4.2, popcnt, avx, aes, clmul, lzcnt, tsc, tscinvbit
+
+Memory: 4k page, physical 1572408k(251964k free), swap 3144816k(1595208k free)
+
+vm_info: Java HotSpot(TM) Client VM (25.91-b14) for windows-x86 JRE (1.8.0_91-b14), built on Apr  1 2016 01:01:28 by "java_re" with MS VC++ 10.0 (VS2010)
+
+time: Mon May 23 22:50:46 2016
+elapsed time: 29 seconds (0d 0h 0m 29s)
+
