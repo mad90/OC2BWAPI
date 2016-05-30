@@ -50,7 +50,7 @@ public class VultureAI  extends DefaultBWListener implements Runnable {
 
     @Override
     public void onFrame() {
-    	if(frame % 30 == 0){
+    	if(frame % 15 == 0){
     		try {
     			//System.out.println("Größe Enemy List in VultureAI: " + this.enemyUnits.size());
 				vulture.step();
@@ -100,10 +100,10 @@ public class VultureAI  extends DefaultBWListener implements Runnable {
 			this.updateEnemyListAI();
     		this.vulture.unit.move(this.vulture.getTargetPos());
     		try {
-				wait(70);
-				while(this.vulture.unit.isMoving()){
-					wait(20);
-				}
+				wait(180);
+				//while(this.vulture.unit.isMoving()){
+				//	wait(20);
+			//	}
 			this.vulture.setTargetPos(this.vulture.getClosestEnemy().getPosition());
 
 			
