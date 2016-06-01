@@ -1,3 +1,4 @@
+package XCSPackage;
 
 import java.util.Random;
 public class PopulationEntry {

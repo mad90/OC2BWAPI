@@ -4,6 +4,8 @@ import java.io.FileNotFoundException;
 import java.util.ArrayList;
 import java.util.HashSet;
 
+import XCSPackage.XCS;
+
 public class Vulture {
 
     private final Mirror bwapi;
@@ -36,19 +38,17 @@ public class Vulture {
     }
 
     public void step() throws InterruptedException {
-    	try {
-    	System.out.println("TargetPos: "+targetPos.toTilePosition().toString());
+    	try{
+    	System.out.println("TargetPos: "+targetPos);
     	int distance = categorizeDistance();
-    	System.out.println(" Distance" + distance);
+    	System.out.println(" Distance"+distance);
     	int cooldown = categorizeCooldown();
-    	System.out.println(" cooldown" + cooldown);
+    	System.out.println(" cooldown"+cooldown);
     	int action;
-    	
     	System.out.println("Pattern: "+ distance+ ", "+cooldown);
     	//System.out.println(this.enemyUnitsToString());
     	//System.out.println(this.vultureXCS.population.toString());
      	action = this.vultureXCS.xcsLoop(distance, cooldown);
-     	System.out.println("Aktion" + action);
      	//System.out.println("Action: "+action);
      	//System.out.println("TargetPos: X " + this.targetPos.getX() + ", Y " + this.targetPos.getY() );
 //    	System.out.println("Closest Enemy: "+ this.getClosestEnemy().getX()+ ", "+ this.getClosestEnemy().getY());
@@ -58,12 +58,10 @@ public class Vulture {
     		
     		this.attackClosestEnemy();
     		System.out.println("Angriff!");
-    		wait(30);
     		}
     	else if(action== 2){
     		this.runAwayFrom(getClosestEnemy());
     		System.out.println("Rückzug!");
-    		wait(15);
     		}
         
     	double reward = calculateReward();
@@ -73,11 +71,13 @@ public class Vulture {
     	//this.addClosestEnemyToEnemyList();
     	//this.targetPos = getClosestEnemy().getPosition();
     	//System.out.println("Größe Enemy List: " + this.enemyUnits.size());
-    	} catch (NullPointerException e2){
+    	
+    	} catch (NullPointerException e){
     		System.out.println("Exception abgewehrt");
-            this.unit.move(this.targetPos);
-            wait(30);
+    	this.unit.move(targetPos);
+    		
     	}
+    	
     	try {
 			this.vultureXCS.writeToFlatFile();
 		} catch (FileNotFoundException e) {
@@ -96,8 +96,8 @@ public class Vulture {
         Unit result = null;
         double minDistance = Double.POSITIVE_INFINITY;
         for (Unit enemy : this.bwapi.getGame().enemy().getUnits()) {
-        	if (enemy.isVisible(this.bwapi.getGame().self())){
-            double distance = this.getDistance(enemy);
+        	if (enemy.isVisible(this.bwapi.getGame().self())){//exists
+            double distance = getDistance(enemy);
             if (distance < minDistance) {
                 minDistance = distance;
                 result = enemy;
@@ -105,26 +105,28 @@ public class Vulture {
         	}
 
         }
-
+        System.out.println("GetClosestEnemy() " + result.getPosition());
         return result;
     }
 
     private double getDistance(Unit enemy) {
     	
-    	// Null check für enemy
-    	/* if (enemy != null) {
-             System.out.println("Enemy is ned NULL");
-         }
-         else {
-             System.out.println("Jackpot");
-         }*/
-    	
+    	if(enemy != null){
+        	System.out.println("Enemy is ned NULL");}
+    	else{
+    	System.out.println("Jackpot");
+    	}
     	return this.unit.getPosition().getDistance(enemy.getPosition());
     }
     
     private double getDistanceClosestEnemy(){
-    	//System.out.println("Distanz zum nächsten Gegner: " + this.unit.getPosition().getDistance(this.getClosestEnemy().getPosition()));
+    	Unit enemy = getClosestEnemy();
+    	if(enemy != null){
+    	System.out.println("Enemy is need NULL");
+    	
+    	}
     	return this.unit.getPosition().getDistance(this.getClosestEnemy().getPosition());
+    	
     }
 
     
@@ -143,9 +145,15 @@ public class Vulture {
 		int category = 0;
 		double weaponrange = WeaponType.Fragmentation_Grenade.maxRange();
 		
+		System.out.println(" test getDistanceClosesest Enemy");
+		
 		double i = (this.getDistanceClosestEnemy()*100)/(weaponrange);
-		 System.out.println("Get Distance closes Enemy test bestanden");
+		
+		System.out.println(" test bestanden");
+		
 		//System.out.println("% Distanz: "+ i);
+		
+		
 		
 		if(i <= 25){
 			category = 1;
@@ -166,7 +174,9 @@ public class Vulture {
 			category = 6;
 		}
 				
+		System.out.println("Kategorie"+category);		
 		return category;
+		
 				
 	}
 	
@@ -212,8 +222,8 @@ public class Vulture {
 		//System.out.println("X: "+ myPos.getX() + " Y: " + myPos.getY());
 		this.unit.move(myPos);
 		}
-		else if (enemy == null){
-			//System.out.println("Kein Gegner zum weglaufen");
+		else if(enemy == null){
+			System.out.println("Kein Gegner zum weglaufen");
 			this.unit.move(this.targetPos);
 			wait(50);
 			while(unit.isMoving()){
@@ -228,14 +238,14 @@ public class Vulture {
 	public void attackClosestEnemy() throws InterruptedException{
 		Unit enemy = getClosestEnemy();
 		if(enemy != null){
-			this.unit.attack(enemy);
+			unit.attack(enemy);
 			while(unit.getGroundWeaponCooldown() == 0){
 				wait(10);
 			}
 			
 		}
-		else if (enemy == null){
-			//System.out.println("Kein Gegner zum angreifen");
+		else if(enemy == null){
+			System.out.println("Kein Gegner zum angreifen");
 			unit.move(this.targetPos);
 			wait(50);
 			while(unit.isMoving()){
@@ -265,7 +275,7 @@ public class Vulture {
 	}
 	
 	public void addClosestEnemyToEnemyList(){
-		Unit enemy = this.getClosestEnemy();
+		Unit enemy = getClosestEnemy();
 		if(!this.enemyUnits.contains(enemy)){
 		this.enemyUnits.add(enemy);
 		//this.targetPos = enemy.getPosition();

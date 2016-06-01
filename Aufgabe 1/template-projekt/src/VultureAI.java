@@ -53,7 +53,9 @@ public class VultureAI  extends DefaultBWListener implements Runnable {
     	if(frame % 15 == 0){
     		try {
     			//System.out.println("Größe Enemy List in VultureAI: " + this.enemyUnits.size());
-				vulture.step();
+				
+    			vulture.step();
+				
 //				System.out.println("Step()");
 				updateEnemyList();
 				updateEnemyListAI();
@@ -86,6 +88,7 @@ public class VultureAI  extends DefaultBWListener implements Runnable {
 //                this.vulture.enemyUnits.add(unit);
 //                this.vulture.setTargetPos(unit.getPosition());
 //                }
+                System.out.println("Position Zealot"+unit.getPosition());
             }
         }
     }
@@ -98,11 +101,11 @@ public class VultureAI  extends DefaultBWListener implements Runnable {
     		this.enemyUnits.remove(unit);
     		this.updateEnemyList();
 			this.updateEnemyListAI();
-    		this.vulture.unit.move(this.vulture.getTargetPos());
+    		this.vulture.unit.move(this.vulture.getTargetPos(), true);
     		try {
-				wait(180);
+				wait(180);//70
 				//while(this.vulture.unit.isMoving()){
-				//	wait(20);
+				//	wait(20);//20
 			//	}
 			this.vulture.setTargetPos(this.vulture.getClosestEnemy().getPosition());
 
