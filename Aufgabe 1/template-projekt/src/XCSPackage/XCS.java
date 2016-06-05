@@ -15,7 +15,9 @@ public class XCS {
 	 PopulationSet population;
 	 ArrayList<PopulationEntry> MatchSet;
 	 ArrayList<PopulationEntry> ActionSet;
-	 boolean useMemory = false;
+	 //schaltet spielübergreifendes Lernen ein -> Zugriff auf XCSMemory
+	 boolean useMemory = true;
+	 boolean noDoubleEntry = true;
 	 int minEntriesMatchSet = 3; //Mindest Menge an Sets die im MatchSet sein müssen
 	 
 	
@@ -27,11 +29,12 @@ public class XCS {
 		if(useMemory){
 			try {
 				this.population = new PopulationSet(readFromFlatFile(), maxsize);
-				
+				System.out.println("Verwende gemerkte Population");
 				if(this.population.isEmpty()){
 					
 					//Falls FlatFile nicht gelesen werden konnte, oder leer ist
 					this.population = new PopulationSet(startsize, maxsize);
+					System.out.println("Population war leer");
 				}
 			} catch (FileNotFoundException e) {
 				// TODO Auto-generated catch block
@@ -40,7 +43,7 @@ public class XCS {
 		}
 		else{
 		this.population = new PopulationSet(startsize ,maxsize);
-		
+		System.out.println("Verwende zufällige Population");
 		}
 		
 	}
@@ -366,17 +369,6 @@ public class XCS {
 //		
 //	}
 	
-	public void writeToFlatFile() throws FileNotFoundException{
-		try(  PrintWriter out = new PrintWriter("XCS Memory.txt")  ){
-			String s = "";
-			for(PopulationEntry e: this.population.PopulationList){
-				s += e.patterndistance + " "+ e.patterncooldown +" " + e.action + " " + e.prediction +" "+ e.predictionError + " " + e.fitness +"\r\n";
-			}
-			out.println(s);
-		}
-		
-	}
-	
 	public ArrayList<PopulationEntry> readFromFlatFile() throws FileNotFoundException{
 		ArrayList<PopulationEntry> populationList = new ArrayList<PopulationEntry>();
 		
@@ -397,6 +389,7 @@ public class XCS {
 			
 			populationList.add(e);
 			System.out.println("Zeile eingelesen!");
+			
 			if(!file.hasNextLine()){
 				notEnd = false;
 			}
@@ -404,11 +397,73 @@ public class XCS {
 
 
 	}
-		System.out.println("Einlesen Fertig!");
+		//System.out.println("Einlesen Fertig!");
 		return populationList;
 		
 	}
-
+	
+	
+	
+	
+	
+	public void writeToFlatFile() throws FileNotFoundException{
+		try(  PrintWriter out = new PrintWriter("XCS Memory.txt")  ){
+			
+			String s = "";
+			for(PopulationEntry e: this.population.PopulationList){
+								
+				s += e.patterndistance + " "+ e.patterncooldown +" " + e.action + " " + e.prediction +" "+ e.predictionError + " " + e.fitness +"\r\n";
+				
+			}
+			out.println(s);
+		}
+		
+	}
+	
+	
+	
+//Nach Dupletten prüfen
+	public boolean equalpopulation(boolean noDoubleEntry){
+		
+		for(PopulationEntry e: this.population.PopulationList){
+			for(PopulationEntry c: this.population.PopulationList){
+	if (e.patterndistance == c.patterndistance && e.patterncooldown == c.patterncooldown && e.action == c.action){
+	noDoubleEntry = true;
+	break;
+	}
+	
+	else{
+	noDoubleEntry = false;
+	}
+			}
+		}
+			
+	return noDoubleEntry;
+				
+	}
+	
+	//cleanen der population
+	public void doublecheck(){
+		
+		if (equalpopulation(noDoubleEntry)==true){
+		for(PopulationEntry e: this.population.PopulationList){
+			if (e.patterndistance == e.patterndistance && e.patterncooldown == e.patterncooldown && e.action == e.action){
+				//remove
+			//e.remove();
+				}
+				
+				else{
+					//nur zum debuggen
+				System.out.println("Keine Duplikate vorhanden");
+				}
+				
+			}
+			
+			
+		}
+		
+				
+	}
 
 	
 	

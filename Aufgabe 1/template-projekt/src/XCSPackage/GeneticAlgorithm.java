@@ -52,9 +52,85 @@ public class GeneticAlgorithm {
 		}
 	}
 	
+	/* Code von Lei für crossOver
+
 	public ArrayList<PopulationEntry> crossOver(PopulationEntry parent1, PopulationEntry parent2){
 		//Liefert 2 durch Crossover entstandene Nachkommen zurück
-		ArrayList<PopulationEntry> offsprings;
+		
+		ArrayList<PopulationEntry> offsprings=new ArrayList<PopulationEntry>();
+		PopulationEntry offspring1=new PopulationEntry();
+		PopulationEntry offspring2=new PopulationEntry();
+		
+		//copy parents classifier 
+		offspring1=parent1;
+		offspring2=parent2;
+		
+		double chiGA=0.5;//probabilität für Anwendung von crossover 
+		//Literatur XCS Algorithic Description Seite 13.
+		if(Math.random()<chiGA){
+			
+			//prediction, prediction error und fitness sind durchschnittliche Zahl von parent1 und parent2	
+			//hier sind die drei Werte für offspring1 und offspring2 gleich
+			
+			offspring1.prediction=(parent1.prediction+parent2.prediction)/2;//prediction
+			offspring2.prediction=offspring1.prediction;
+			
+			offspring1.predictionError=(parent1.predictionError+parent2.predictionError)/2;//prediction error
+			offspring2.predictionError=offspring1.predictionError;
+			
+			offspring1.fitness=(parent1.fitness+parent2.fitness)/2;//fitness
+			offspring2.fitness=offspring1.fitness;		
+			
+			//two point crossover Tauschen Distanz und cooldown zwischen parent1 und parent2
+			//Literatur XCS Algorithic Description Seite 14.
+			int x=(int)(Math.random()*(2+1));//x ist zwischen [0-2] Raum ist abgeschlossen
+			int y=(int)(Math.random()*(2+1));//y ist zwischen [0-2] Raum ist abgeschlossen
+			if(x>y){
+				int z=y;
+				y=x;
+				x=z;
+			}
+		
+			//temporäre variablen für Distanz und Cooldown von parent1
+			int parent1_patterndistance=parent1.patterndistance;
+			int parent1_patterncooldown=parent1.patterncooldown;
+			
+			//Vertauschensverfahren. Es gibt nur zwei möglichkeiten. Vertauschung von Distanz oder Vertauschung von Cooldown
+			int i=0;
+			do{
+				if(x<=i&&i<y){
+					if(i==0){
+						parent1.patterndistance=parent2.patterndistance;
+						parent2.patterndistance=parent1_patterndistance;
+					}else{
+						parent1.patterncooldown=parent2.patterncooldown;
+						parent2.patterncooldown=parent1_patterncooldown;
+					}
+				
+				}
+			}while(i<y);//i ist zwischen [0-1] Raum ist abgeschlossen
+		}
+//		/* 
+//		***********ich weiss es nicht, was in den Zeile 18 und 19 bedeutet
+//		else{
+//			offspring1.fitness*=0.1;
+//			offspring2.fitness*=0.1;			
+//		}
+//		*/
+	
+		/*
+		offsprings.add(offspring1);
+		offsprings.add(offspring2);		
+		
+		return offsprings;
+	}
+	
+	*/
+
+
+	public ArrayList<PopulationEntry> crossOver(PopulationEntry parent1, PopulationEntry parent2){
+		//Liefert 2 durch Crossover entstandene Nachkommen zurück
+		ArrayList<PopulationEntry> offsprings = null;
 		
 		
 		
