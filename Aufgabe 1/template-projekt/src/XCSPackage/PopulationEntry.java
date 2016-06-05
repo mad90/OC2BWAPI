@@ -166,6 +166,14 @@ public class PopulationEntry {
 	public void incrementExperience(){
 		this.experience++;
 	}
+
+	
+
+	public static void remove(int patterndistance, int patterncooldown, int action, double prediction,
+			double predictionError, double fitness) {
+		// TODO Auto-generated method stub
+		
+	}
 	
 
 	

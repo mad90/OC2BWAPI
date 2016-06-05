@@ -17,7 +17,7 @@ public class XCS {
 	 ArrayList<PopulationEntry> ActionSet;
 	 //schaltet spielübergreifendes Lernen ein -> Zugriff auf XCSMemory
 	 boolean useMemory = true;
-	 boolean noDoubleEntry = true;
+	 
 	 int minEntriesMatchSet = 3; //Mindest Menge an Sets die im MatchSet sein müssen
 	 
 	
@@ -423,8 +423,8 @@ public class XCS {
 	
 	
 //Nach Dupletten prüfen
-	public boolean equalpopulation(boolean noDoubleEntry){
-		
+	public boolean equalpopulation(){
+		boolean noDoubleEntry = false;
 		for(PopulationEntry e: this.population.PopulationList){
 			for(PopulationEntry c: this.population.PopulationList){
 	if (e.patterndistance == c.patterndistance && e.patterncooldown == c.patterncooldown && e.action == c.action){
@@ -445,11 +445,23 @@ public class XCS {
 	//cleanen der population
 	public void doublecheck(){
 		
-		if (equalpopulation(noDoubleEntry)==true){
+		if (equalpopulation()==true){
 		for(PopulationEntry e: this.population.PopulationList){
-			if (e.patterndistance == e.patterndistance && e.patterncooldown == e.patterncooldown && e.action == e.action){
-				//remove
-			//e.remove();
+			for(PopulationEntry c: this.population.PopulationList){
+			if (e.patterndistance == c.patterndistance && e.patterncooldown == e.patterncooldown && c.action == e.action){
+				if (e.fitness<=c.fitness){
+					//bei zwei auswahl mit der kleinsten fitness
+					
+					PopulationEntry.remove(e.patterndistance, e.patterncooldown, e.action, e.prediction, e.predictionError, e.fitness);
+					
+				}
+				
+				
+				else {
+					PopulationEntry.remove(c.patterndistance, c.patterncooldown, c.action, c.prediction, c.predictionError, c.fitness);
+					
+					
+				}
 				}
 				
 				else{
@@ -462,7 +474,7 @@ public class XCS {
 			
 		}
 		
-				
+		}		
 	}
 
 	
