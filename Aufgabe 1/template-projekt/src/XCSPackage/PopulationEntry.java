@@ -175,6 +175,16 @@ public class PopulationEntry {
 		
 	}
 	
+	public boolean isEqual(PopulationEntry entry1){
+		if(entry1.getPatternCooldown() == this.getPatternCooldown() && entry1.getPatternDistance()== this.getPatternDistance() && entry1.getAction() == this.getAction()){
+			return true;
+		}
+		else{
+			return false;
+		}
+		
+	}
+	
 
 	
 	

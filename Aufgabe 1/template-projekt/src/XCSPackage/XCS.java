@@ -427,54 +427,70 @@ public class XCS {
 		boolean noDoubleEntry = false;
 		for(PopulationEntry e: this.population.PopulationList){
 			for(PopulationEntry c: this.population.PopulationList){
-	if (e.patterndistance == c.patterndistance && e.patterncooldown == c.patterncooldown && e.action == c.action){
-	noDoubleEntry = true;
-	break;
-	}
-	
-	else{
-	noDoubleEntry = false;
-	}
+				if (e.patterndistance == c.patterndistance && e.patterncooldown == c.patterncooldown && e.action == c.action){
+					noDoubleEntry = true;
+					break;
+				}
+				else{
+					noDoubleEntry = false;
+				}
 			}
 		}
-			
 	return noDoubleEntry;
-				
 	}
 	
 	//cleanen der population
 	public void doublecheck(){
-		
 		if (equalpopulation()==true){
-		for(PopulationEntry e: this.population.PopulationList){
-			for(PopulationEntry c: this.population.PopulationList){
-			if (e.patterndistance == c.patterndistance && e.patterncooldown == e.patterncooldown && c.action == e.action){
-				if (e.fitness<=c.fitness){
+			for(PopulationEntry e: this.population.PopulationList){
+				for(PopulationEntry c: this.population.PopulationList){
+					if (e.patterndistance == c.patterndistance && e.patterncooldown == e.patterncooldown && c.action == e.action){
+						if (e.fitness<=c.fitness){
 					//bei zwei auswahl mit der kleinsten fitness
 					
-					PopulationEntry.remove(e.patterndistance, e.patterncooldown, e.action, e.prediction, e.predictionError, e.fitness);
-					
+							PopulationEntry.remove(e.patterndistance, e.patterncooldown, e.action, e.prediction, e.predictionError, e.fitness);
+						}
+						else{
+							PopulationEntry.remove(c.patterndistance, c.patterncooldown, c.action, c.prediction, c.predictionError, c.fitness);
+						}
 				}
-				
-				
-				else {
-					PopulationEntry.remove(c.patterndistance, c.patterncooldown, c.action, c.prediction, c.predictionError, c.fitness);
-					
-					
-				}
-				}
-				
-				else{
+					else{
 					//nur zum debuggen
-				System.out.println("Keine Duplikate vorhanden");
+						System.out.println("Keine Duplikate vorhanden");
+					}
 				}
-				
 			}
-			
-			
-		}
 		
 		}		
+	}
+	
+	public void deleteDuplicantEntries(PopulationEntry pattern){
+		//PopulationSet nach gleichartigen Einträgen wie pattern durchsuchen, und alle bis auf den mit der höchsten Fitness löschen
+		//Speichert den aktuell besten Eintrag
+		PopulationEntry best = pattern; 
+		//Duplikate die nicht die höchste Fitness haben
+		ArrayList<PopulationEntry> weak = new ArrayList<PopulationEntry>(); 
+		for(PopulationEntry e: this.population.PopulationList){
+			if(e.isEqual(pattern) && e.getFitness() > best.getFitness()){
+				//Wenn besserer gefunden, hinzufügen zur Liste der "Schwachen" und ersetzen des Besten durch e
+				weak.add(best);
+				best = e;
+			}
+		}
+		if(!weak.isEmpty()){
+			for(PopulationEntry w: weak){
+				//"Die Schwachen" aus de Population entfernen
+				this.population.PopulationList.remove(w);
+			}
+		}
+	}
+	
+	public void deleteDuplicantsFromPopulationSet(){
+		//Offene Frage: Kann es zu Problemen kommen wenn man während einer For-each-Schleife Elemente löscht?
+		//Mögliche Lösung: stattdessen einen Iterator mit next() benutzen?
+		for(PopulationEntry e : this.population.PopulationList){
+			deleteDuplicantEntries(e);
+		}
 	}
 
 	

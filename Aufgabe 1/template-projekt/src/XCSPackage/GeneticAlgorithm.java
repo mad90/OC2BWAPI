@@ -5,6 +5,7 @@ import java.util.HashMap;
 import java.util.Random;
 
 public class GeneticAlgorithm {
+	//Chance in Prozent wie oft eine Mutation eintritt
 	static double mutationChance = 5;
 	
 	
@@ -39,11 +40,6 @@ public class GeneticAlgorithm {
 			}
 			
 		}
-		
-		
-		
-		
-		
 		if(key != Double.POSITIVE_INFINITY){
 		return wheel.get(key);
 		}
