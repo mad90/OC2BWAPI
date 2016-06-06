@@ -52,7 +52,7 @@ public class GeneticAlgorithm {
 		}
 	}
 	
-	/* Code von Lei für crossOver
+
 
 	public ArrayList<PopulationEntry> crossOver(PopulationEntry parent1, PopulationEntry parent2){
 		//Liefert 2 durch Crossover entstandene Nachkommen zurück
@@ -81,34 +81,25 @@ public class GeneticAlgorithm {
 			offspring1.fitness=(parent1.fitness+parent2.fitness)/2;//fitness
 			offspring2.fitness=offspring1.fitness;		
 			
-			//two point crossover Tauschen Distanz und cooldown zwischen parent1 und parent2
-			//Literatur XCS Algorithic Description Seite 14.
-			int x=(int)(Math.random()*(2+1));//x ist zwischen [0-2] Raum ist abgeschlossen
-			int y=(int)(Math.random()*(2+1));//y ist zwischen [0-2] Raum ist abgeschlossen
-			if(x>y){
-				int z=y;
-				y=x;
-				x=z;
-			}
-		
+
 			//temporäre variablen für Distanz und Cooldown von parent1
 			int parent1_patterndistance=parent1.patterndistance;
 			int parent1_patterncooldown=parent1.patterncooldown;
 			
 			//Vertauschensverfahren. Es gibt nur zwei möglichkeiten. Vertauschung von Distanz oder Vertauschung von Cooldown
-			int i=0;
-			do{
-				if(x<=i&&i<y){
-					if(i==0){
-						parent1.patterndistance=parent2.patterndistance;
-						parent2.patterndistance=parent1_patterndistance;
-					}else{
-						parent1.patterncooldown=parent2.patterncooldown;
-						parent2.patterncooldown=parent1_patterncooldown;
-					}
+			
+			Random random = new Random();
+			int i=random.nextInt(2);
+			if(i==0){
+				parent1.patterndistance=parent2.patterndistance;
+				parent2.patterndistance=parent1_patterndistance;
+			}else{
+				parent1.patterncooldown=parent2.patterncooldown;
+				parent2.patterncooldown=parent1_patterncooldown;
+			}
+					
 				
-				}
-			}while(i<y);//i ist zwischen [0-1] Raum ist abgeschlossen
+				
 		}
 //		/* 
 //		***********ich weiss es nicht, was in den Zeile 18 und 19 bedeutet
@@ -118,15 +109,15 @@ public class GeneticAlgorithm {
 //		}
 //		*/
 	
-		/*
+		
 		offsprings.add(offspring1);
 		offsprings.add(offspring2);		
 		
 		return offsprings;
 	}
 	
-	*/
-
+	
+/*
 
 	public ArrayList<PopulationEntry> crossOver(PopulationEntry parent1, PopulationEntry parent2){
 		//Liefert 2 durch Crossover entstandene Nachkommen zurück
@@ -137,7 +128,7 @@ public class GeneticAlgorithm {
 		
 		return offsprings;
 	}
-	
+	*/
 	public PopulationEntry mutation(PopulationEntry input){
 		//Mutiert mit einer gewissen Chance das Pattern oder die Action des Entry
 		Random random = new Random();
