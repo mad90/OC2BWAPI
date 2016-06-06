@@ -1,6 +1,7 @@
 package XCSPackage;
 import java.io.*;
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Scanner;
 
@@ -469,7 +470,8 @@ public class XCS {
 		//Speichert den aktuell besten Eintrag
 		PopulationEntry best = pattern; 
 		//Duplikate die nicht die höchste Fitness haben
-		ArrayList<PopulationEntry> weak = new ArrayList<PopulationEntry>(); 
+		ArrayList<PopulationEntry> weak = new ArrayList<PopulationEntry>();
+		
 		for(PopulationEntry e: this.population.PopulationList){
 			if(e.isEqual(pattern) && e.getFitness() > best.getFitness()){
 				//Wenn besserer gefunden, hinzufügen zur Liste der "Schwachen" und ersetzen des Besten durch e
@@ -488,7 +490,10 @@ public class XCS {
 	public void deleteDuplicantsFromPopulationSet(){
 		//Offene Frage: Kann es zu Problemen kommen wenn man während einer For-each-Schleife Elemente löscht?
 		//Mögliche Lösung: stattdessen einen Iterator mit next() benutzen?
-		for(PopulationEntry e : this.population.PopulationList){
+		Iterator<PopulationEntry> it = this.population.PopulationList.iterator();
+		
+		while(it.hasNext()){
+			PopulationEntry e = it.next();
 			deleteDuplicantEntries(e);
 		}
 	}
