@@ -38,7 +38,7 @@ public class StupidMarineAI extends DefaultBWListener implements Runnable {
 		this.frame = 0;
 
 		// complete map information
-		this.game.enableFlag(0);
+		this.game.enableFlag(1);
 
 		// user input
 		this.game.enableFlag(1);
@@ -61,7 +61,7 @@ public class StupidMarineAI extends DefaultBWListener implements Runnable {
 	public void onUnitCreate(Unit unit) {
 		if (unit.getType() == UnitType.Terran_Marine) {
 			if (unit.getPlayer().equals(this.self)) {
-				this.marines.add(new Marine(unit, this.enemyUnits));
+				this.marines.add(new Marine(unit, this.enemyUnits, game));
 			} else {
 				this.enemyUnits.add(unit);
 			}
