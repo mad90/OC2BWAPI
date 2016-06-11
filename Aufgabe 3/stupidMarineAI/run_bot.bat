@@ -1,0 +1,1 @@
+start cmd.exe /k java -jar C:\starcraft_iccup\bwapi-data\data\stupidMarineAI.jar"
