@@ -1,6 +1,7 @@
 
 import bwapi.*;
 
+import java.util.ArrayList;
 import java.util.HashSet;
 
 /**
@@ -22,6 +23,7 @@ public class Marine {
 	double wr3;		//Gewicht für Regel 3
 	double wr4;		//Gewicht für Regel 4
 	static int seperation = 20;
+	static int searchradius = 50;
 	
 	
 	
@@ -78,10 +80,10 @@ public class Marine {
 		
 		if(units.size()> 0)
 		{
-		for(Unit u : units){
-			x += u.getPosition().getX();
-			y += u.getPosition().getY();
-		}
+			for(Unit u : units){
+				x += u.getPosition().getX();
+				y += u.getPosition().getY();
+			}
 		
 		x = (int)(x/units.size());
 		y = (int)(y/units.size());
@@ -177,6 +179,71 @@ public class Marine {
 		}
 
 	}
+	
+	public Position calculateBestLine(){
+		//Berechnung der Bereiche der Linien (Bereiche horizontal)
+		int leftborder = this.unit.getPosition().getX() - this.searchradius;
+		int rightborder = this.unit.getPosition().getX() + this.searchradius;
+		
+		int nbrlin = (int)((this.searchradius*2)/(this.rlin+this.rlinsep));
+		//Zum Speichern der Anzahl der Einheiten in Line
+		ArrayList<HashSet<Unit>> alllines = new ArrayList<HashSet<Unit>>();
+		
+		while(alllines.size() < nbrlin){
+			alllines.add(new HashSet<Unit>());
+		}
+		
+		int ulin = 0;
+		//Zähle Einheiten in den einzelnen Bereichen
+		for(Unit u : getNearbyMarines()){
+			ulin = (int)((leftborder - u.getPosition().getX())/this.rlin + this.rlinsep);
+			alllines.get(ulin).add(u);
+		}
+		
+		//Bereich mit den meisten Einheiten auswählen
+		int tmphighest = -1;
+		for(HashSet<Unit> lin : alllines){
+			if(tmphighest > lin.size()){
+				tmphighest = lin.size();
+			}
+		}
+		return getMediumPosition(alllines.get(tmphighest));
+		
+	}
+		
+	
+	
+	public Position calculateBestCol(){
+		//Berechnung der Zeilen (Bereiche vertikal)
+		int topborder = this.unit.getPosition().getY() - this.searchradius;
+		int botborder = this.unit.getPosition().getY() + this.searchradius;
+		
+		int nbrcol = (int)((this.searchradius*2)/(this.rcol+this.rcolsep));
+		//Zum Speichern der Anzahl der Einheiten in Column
+		ArrayList<HashSet<Unit>> allcolumns = new ArrayList<HashSet<Unit>>();
+		
+		while(allcolumns.size() < nbrcol){
+			allcolumns.add(new HashSet<Unit>());
+		}
+		
+		int ucol = 0;
+		//Zähle Einheiten in den einzelnen Bereichen
+		for(Unit u : getNearbyMarines()){
+			ucol = (int)((topborder - u.getPosition().getY())/this.rcol + this.rcolsep);
+			allcolumns.get(ucol).add(u);
+		}
+		
+		//Bereich mit den meisten Einheiten auswählen
+		int tmphighest = -1;
+		for(HashSet<Unit> col : allcolumns){
+			if(tmphighest > col.size()){
+				tmphighest = col.size();
+			}
+		}
+		return getMediumPosition(allcolumns.get(tmphighest));
+		
+	}
+	
 
 	private Unit getClosestEnemy() {
 		Unit result = null;
