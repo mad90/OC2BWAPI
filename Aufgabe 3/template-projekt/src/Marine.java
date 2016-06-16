@@ -11,19 +11,23 @@ public class Marine {
 
 	private final HashSet<Unit> enemyUnits;
 	final private Unit unit;
-	double rsig; 	//Abstand zu seinen Nachbarn
-	double rsep; 	//Abstand der Seperation
-	double rcol; 	//Breite der Reihen-Formation
-	double rcolsep; //Seperation innerhalb der Reihen-Formation
-	double rlin;	//Höhe der Linien-Formation
-	double rlinsep; //Seperation innerhalb der Linien-Formation
-	double wr1a;	//Gewicht für Regel 1 wenn kein Feind gesehen wurde
-	double wr1b;	//Gewicht für Regel 1 wenn wir Feind sehen
-	double wr2;		//Gewicht für Regel 2
-	double wr3;		//Gewicht für Regel 3
-	double wr4;		//Gewicht für Regel 4
-	static int seperation = 20;
-	static int searchradius = 50;
+	//Skalare?
+	double rsig = 1; 	//Abstand zu seinen Nachbarn
+	double rsep = 1; 	//Abstand der Seperation
+	double rcol = 1; 	//Breite der Reihen-Formation
+	double rcolsep = 1; //Seperation innerhalb der Reihen-Formation
+	double rlin = 1;	//Höhe der Linien-Formation
+	double rlinsep = 1; //Seperation innerhalb der Linien-Formation
+	//Gewichte
+	double wr1a = 1;	//Gewicht für Regel 1 wenn kein Feind gesehen wurde
+	double wr1b = 1;	//Gewicht für Regel 1 wenn wir Feind sehen
+	double wr2 = 1;		//Gewicht für Regel 2
+	double wr3 = 1;		//Gewicht für Regel 3
+	double wr4 = 1;		//Gewicht für Regel 4
+	//Basiswerte
+	static int seperation = 15;
+	static int searchradius = 120;
+	static int broadth = 40;
 	
 	
 	
@@ -46,6 +50,7 @@ public class Marine {
 		Unit target = getClosestEnemy();
 		
 		if (target == null) {
+			move(target);
 			return;
 		}
 		else if(this.unit.getGroundWeaponCooldown() == 0 && !this.unit.isAttackFrame() && !this.unit.isStartingAttack()
@@ -64,7 +69,7 @@ public class Marine {
 	private HashSet<Unit> getNearbyMarines(){
 		//Gibt alle eignene Marine in einem Radius um die Einheit zurück
 		HashSet<Unit> nearbyMarines = new HashSet<>();
-		for(Unit u : this.unit.getUnitsInRadius(this.seperation)){
+		for(Unit u : this.unit.getUnitsInRadius(this.searchradius)){
 			if(u.getType() == UnitType.Terran_Marine && u.getPlayer() ==  game.self()){
 				nearbyMarines.add(u);
 			}
@@ -113,10 +118,10 @@ public class Marine {
 	
 
 	private void move(Unit target) {
-		if (target == null) {
-			return;
-		}
-		System.out.println("move()");
+//		if (target == null) {
+//			return;
+//		}
+//		System.out.println("move()");
 		// TODO: Implement the flocking behavior in this method.
 //		if(this.getNearbyMarines().size() > 0){
 //		if(this.unit.getDistance(getMediumPosition(this.getNearbyMarines())) >= this.cohesion){
@@ -144,7 +149,8 @@ public class Marine {
 //			
 //		}
 //		this.unit.move(new Position(target.getPosition().getX(), target.getPosition().getY()), false);
-		this.unit.move(calculateMovePosition(target), false);
+		calculateBestLine();
+		//this.unit.move(calculateMovePosition(target), false);
 	}
 	
 	public Position calculateMovePosition(Unit target){
@@ -183,21 +189,27 @@ public class Marine {
 	public Position calculateBestLine(){
 		//Berechnung der Bereiche der Linien (Bereiche horizontal)
 		int leftborder = this.unit.getPosition().getX() - this.searchradius;
-		int rightborder = this.unit.getPosition().getX() + this.searchradius;
+//		int rightborder = this.unit.getPosition().getX() + this.searchradius;
 		
-		int nbrlin = (int)((this.searchradius*2)/(this.rlin+this.rlinsep));
+		int nbrlin = (int)((this.searchradius*2)/((this.rlin*broadth)+(this.rlinsep*seperation)));
 		//Zum Speichern der Anzahl der Einheiten in Line
 		ArrayList<HashSet<Unit>> alllines = new ArrayList<HashSet<Unit>>();
+//		System.out.println("Anzahl der gefundenen Linien: " + nbrlin);
 		
-		while(alllines.size() < nbrlin){
+		for(int i = 0;i < nbrlin; i++){
+//			System.out.println("Add new Line!");
 			alllines.add(new HashSet<Unit>());
 		}
+		System.out.println("----------------");
 		
 		int ulin = 0;
+		System.out.println("Anzahl der Nahen Marine "+getNearbyMarines().size());
 		//Zähle Einheiten in den einzelnen Bereichen
 		for(Unit u : getNearbyMarines()){
-			ulin = (int)((leftborder - u.getPosition().getX())/this.rlin + this.rlinsep);
+			ulin = (int)((u.getPosition().getX() -leftborder)/((this.rlin*broadth)+(this.rlinsep*seperation)));
+			System.out.println("Einheit befindet sich in Linie: "+ulin);
 			alllines.get(ulin).add(u);
+			System.out.println("Einheit zur Linie "+ ulin+" hinzugefügt!" );
 		}
 		
 		//Bereich mit den meisten Einheiten auswählen
@@ -207,6 +219,7 @@ public class Marine {
 				tmphighest = lin.size();
 			}
 		}
+		System.out.println("Anzahl Einheiten in Line mit den Meisten: " + alllines.get(tmphighest).size());
 		return getMediumPosition(alllines.get(tmphighest));
 		
 	}
@@ -216,9 +229,9 @@ public class Marine {
 	public Position calculateBestCol(){
 		//Berechnung der Zeilen (Bereiche vertikal)
 		int topborder = this.unit.getPosition().getY() - this.searchradius;
-		int botborder = this.unit.getPosition().getY() + this.searchradius;
+//		int botborder = this.unit.getPosition().getY() + this.searchradius;
 		
-		int nbrcol = (int)((this.searchradius*2)/(this.rcol+this.rcolsep));
+		int nbrcol = (int)((this.searchradius*2)/((this.rcol*broadth)+(this.rcolsep*seperation)));
 		//Zum Speichern der Anzahl der Einheiten in Column
 		ArrayList<HashSet<Unit>> allcolumns = new ArrayList<HashSet<Unit>>();
 		
@@ -229,7 +242,7 @@ public class Marine {
 		int ucol = 0;
 		//Zähle Einheiten in den einzelnen Bereichen
 		for(Unit u : getNearbyMarines()){
-			ucol = (int)((topborder - u.getPosition().getY())/this.rcol + this.rcolsep);
+			ucol = (int)((topborder - u.getPosition().getY())/((this.rcol*broadth)+(this.rcolsep*seperation)));
 			allcolumns.get(ucol).add(u);
 		}
 		
@@ -240,6 +253,7 @@ public class Marine {
 				tmphighest = col.size();
 			}
 		}
+		System.out.println("Anzahl Einheiten in Spalte mit den Meisten: " + allcolumns.get(tmphighest).size());
 		return getMediumPosition(allcolumns.get(tmphighest));
 		
 	}
