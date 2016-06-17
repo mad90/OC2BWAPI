@@ -11,14 +11,14 @@ public class Marine {
 
 	private final HashSet<Unit> enemyUnits;
 	final private Unit unit;
-	//Skalare?
+	//Skalare [0,1]
 	double rsig = 1; 	//Abstand zu seinen Nachbarn
 	double rsep = 1; 	//Abstand der Seperation
 	double rcol = 1; 	//Breite der Reihen-Formation
 	double rcolsep = 1; //Seperation innerhalb der Reihen-Formation
 	double rlin = 1;	//Höhe der Linien-Formation
 	double rlinsep = 1; //Seperation innerhalb der Linien-Formation
-	//Gewichte
+	//Gewichte [0,2]
 	double wr1a = 1;	//Gewicht für Regel 1 wenn kein Feind gesehen wurde
 	double wr1b = 1;	//Gewicht für Regel 1 wenn wir Feind sehen
 	double wr2 = 1;		//Gewicht für Regel 2
@@ -150,26 +150,35 @@ public class Marine {
 //		}
 //		this.unit.move(new Position(target.getPosition().getX(), target.getPosition().getY()), false);
 		calculateBestLine();
+		System.out.println("calculateBestLine() -DONE-");
 		//this.unit.move(calculateMovePosition(target), false);
 	}
 	
 	public Position calculateMovePosition(Unit target){
 		//Bisschen rumtesten
 		//Vektor zum Gegner target
+		//Rule 1)
 		Vector vr1 = new Vector(this.unit.getPosition(), target.getPosition());
+		
 		//Seperation
+		//Rule 2)
 		Vector vr2 = new Vector(0,0);
 		for(Unit u: getNearbyMarines()){
 			if(this.unit.getDistance(u) < this.seperation){
-				vr2 = vr2.add(new Vector(u.getPosition(), this.unit.getPosition()));
+				//Addiere Vektoren von zu nahen Einheiten zur eigenen Einheit auf
+				vr2 = vr2.add(new Vector(this.unit.getPosition(), u.getPosition()));
 			}
 		}
 		//Cohesion
 		Vector vrcoh = new Vector(this.unit.getPosition(), getMediumPosition(getNearbyMarines()));
-		//TODO: Regel 3 richtig berechnen für Reihen
-		Vector vr3 = vr2.add(vrcoh);
-		//TODO: Regel 4 richtig berechnen für Linien
-		Vector vr4 = vr2.add(vrcoh);
+		
+		//Rule 3) In das Zentrum der geeignetsten Column bewegen
+		Position centcol = calculateBestCol();
+		Vector vr3 = new Vector(centcol.getX(), centcol.getY());
+		
+		//Rule 4) In das Zentrum der geeignetsten Line bewegen
+		Position centlin = calculateBestLine();
+		Vector vr4 = new Vector(centlin.getX(), centlin.getY());
 		
 		
 		Vector pc = new Vector(this.unit.getPosition().getX(), this.unit.getPosition().getY());
@@ -207,20 +216,25 @@ public class Marine {
 		//Zähle Einheiten in den einzelnen Bereichen
 		for(Unit u : getNearbyMarines()){
 			ulin = (int)((u.getPosition().getX() -leftborder)/((this.rlin*broadth)+(this.rlinsep*seperation)));
-			System.out.println("Einheit befindet sich in Linie: "+ulin);
+//			System.out.println("Einheit befindet sich in Linie: "+ulin);
 			alllines.get(ulin).add(u);
 			System.out.println("Einheit zur Linie "+ ulin+" hinzugefügt!" );
 		}
 		
 		//Bereich mit den meisten Einheiten auswählen
-		int tmphighest = -1;
+		int tmphighest = Integer.MIN_VALUE;
+//		System.out.println("Anzahl der Reihen in AllLines" + alllines.size());
 		for(HashSet<Unit> lin : alllines){
-			if(tmphighest > lin.size()){
+//			System.out.println("tmphighest: "+ tmphighest+" Lin: "+ lin.size());
+			if(tmphighest < lin.size()){
 				tmphighest = lin.size();
 			}
 		}
 		System.out.println("Anzahl Einheiten in Line mit den Meisten: " + alllines.get(tmphighest).size());
+		if(tmphighest != Integer.MIN_VALUE){
 		return getMediumPosition(alllines.get(tmphighest));
+		}
+		else return this.unit.getPosition();
 		
 	}
 		
@@ -235,27 +249,31 @@ public class Marine {
 		//Zum Speichern der Anzahl der Einheiten in Column
 		ArrayList<HashSet<Unit>> allcolumns = new ArrayList<HashSet<Unit>>();
 		
-		while(allcolumns.size() < nbrcol){
+		for(int i = 0;i < nbrcol; i++){
 			allcolumns.add(new HashSet<Unit>());
 		}
 		
 		int ucol = 0;
 		//Zähle Einheiten in den einzelnen Bereichen
 		for(Unit u : getNearbyMarines()){
-			ucol = (int)((topborder - u.getPosition().getY())/((this.rcol*broadth)+(this.rcolsep*seperation)));
+			ucol = (int)((u.getPosition().getY() - topborder)/((this.rcol*broadth)+(this.rcolsep*seperation)));
 			allcolumns.get(ucol).add(u);
 		}
 		
 		//Bereich mit den meisten Einheiten auswählen
-		int tmphighest = -1;
+		int tmphighest = Integer.MIN_VALUE;
 		for(HashSet<Unit> col : allcolumns){
-			if(tmphighest > col.size()){
+			if(tmphighest < col.size()){
 				tmphighest = col.size();
 			}
 		}
 		System.out.println("Anzahl Einheiten in Spalte mit den Meisten: " + allcolumns.get(tmphighest).size());
-		return getMediumPosition(allcolumns.get(tmphighest));
 		
+		//
+		if(tmphighest != Integer.MIN_VALUE){
+		return getMediumPosition(allcolumns.get(tmphighest));
+		}
+		else return this.unit.getPosition();
 	}
 	
 

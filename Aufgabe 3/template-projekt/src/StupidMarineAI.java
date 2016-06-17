@@ -48,9 +48,10 @@ public class StupidMarineAI extends DefaultBWListener implements Runnable {
 	@Override
 	public void onFrame() {
 		int i = 0;
+		System.out.println("Anzahl der gesamten Marines: " + this.marines.size());
 		for (Marine m : this.marines) {
 			i++;
-			System.out.println("Durchlauf "+ i);
+//			System.out.println("Durchlauf "+ i);
 			m.step();
 		}
 
