@@ -37,7 +37,7 @@ public class Population {
 	public GAParameter[] selectParents(){
 		GAParameter[] parents=new GAParameter[2];
 		for(int i=0;i<2;i++){
-			parents[i]=;
+//			parents[i]=;
 		}
 		return parents;
 	}

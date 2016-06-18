@@ -51,7 +51,7 @@ public class StupidMarineAI extends DefaultBWListener implements Runnable {
 		System.out.println("Anzahl der gesamten Marines: " + this.marines.size());
 		for (Marine m : this.marines) {
 			i++;
-//			System.out.println("Durchlauf "+ i);
+			System.out.println("Durchlauf "+ i);
 			m.step();
 		}
 
