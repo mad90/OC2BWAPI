@@ -1,7 +1,8 @@
 
 import java.util.ArrayList;
 import java.util.Random;
-public class GAParameter {
+import java.io.*;
+public class GAParameter implements Serializable {
 	
 	//r gehören zu [0,1]
 	int r_sig;			//Range of neighborhood of current character
@@ -155,9 +156,138 @@ public class GAParameter {
 	//Vordere 6 Parameter sind in [0,1], deshalb verändern wir von 1 zu 0 oder von 0 zu 1;
 	//hintere 5 Parameter sind in [0,2], deshalb gibt es meht Möglichkeit, deswegen gibt es viele if... else if...9 Möglichkeiten.
 	//d.h. (00)(11)(22)(10)(01)(21)(12)(02)(20)
+	public GAParameter[] mutate(GAParameter ch1,GAParameter ch2){
+		GAParameter child=new GAParameter();
+		GAParameter child1;
+		GAParameter child2;
+		int i;
+		int[] i1=child.changeToIntarray(ch1);
+		int[] i2=child.changeToIntarray(ch2);
+		int pivot=rand.nextInt(i1.length);
+		
+		if(pivot<6){
+			if(i1[pivot]==1&&i2[pivot]==1){
+				i1[pivot]=0;
+				i2[pivot]=0;
+			}else if(i1[pivot]==0&&i2[pivot]==1){
+				i1[pivot]=1;
+				i2[pivot]=0;
+			}else if(i1[pivot]==1&&i2[pivot]==0){
+				i1[pivot]=0;
+				i2[pivot]=1;
+			}else{
+				i1[pivot]=1;
+				i2[pivot]=1;
+			}
+		}else{
+			if(i1[pivot]==2&&i2[pivot]==2){
+				i1[pivot]=rand.nextInt(2);
+				i2[pivot]=rand.nextInt(2);
+			}else if(i1[pivot]==0&&i2[pivot]==0){
+				i1[pivot]=rand.nextInt(2)+1;
+				i2[pivot]=rand.nextInt(2)+1;
+			}else if(i1[pivot]==0&&i2[pivot]==2){
+				i1[pivot]=rand.nextInt(2)+1;
+				i2[pivot]=rand.nextInt(2);
+			}else if(i1[pivot]==2&&i2[pivot]==0){
+				i1[pivot]=rand.nextInt(2);
+				i2[pivot]=rand.nextInt(2)+1;				
+			}else if(i1[pivot]==2&&i2[pivot]==1){
+				i1[pivot]=rand.nextInt(2);
+				do{
+					i=rand.nextInt(3);
+					if(i!=1){
+						i2[pivot]=i;
+					}
+				}while(i2[pivot]==1);
+//				if(rand.nextInt(2)<1){
+//					i2[pivot]=0;
+//				}else{
+//					i2[pivot]=2;
+//				}
+			}else if(i1[pivot]==1&&i2[pivot]==2){
+				do{
+					i=rand.nextInt(3);
+					if(i!=1){
+						i1[pivot]=i;
+					}
+				}while(i1[pivot]==1);
+//				if(rand.nextInt(2)<1){
+//					i1[pivot]=0;
+//				}else{
+//					i1[pivot]=2;
+//				}
+				i2[pivot]=rand.nextInt(2);
+			}else if(i1[pivot]==1&&i2[pivot]==1){
+				do{
+					i=rand.nextInt(3);
+					if(i!=1){
+						i1[pivot]=i;
+					}
+				}while(i1[pivot]==1);
+				do{
+					i=rand.nextInt(3);
+					if(i!=1){
+						i2[pivot]=i;
+					}
+				}while(i2[pivot]==1);
+//				if(rand.nextInt(2)<1){
+//					if(rand.nextInt(2)<1){
+//						i1[pivot]=0;
+//						i2[pivot]=2;
+//					}else{
+//						i1[pivot]=2;
+//						i2[pivot]=0;
+//					}
+//				}else{
+//					if(rand.nextInt(2)<1){
+//						i1[pivot]=0;
+//						i2[pivot]=0;
+//					}else{
+//						i1[pivot]=2;
+//						i2[pivot]=2;
+//					}
+//				}
+					
+			}else if(i1[pivot]==1&&i2[pivot]==0){
+				do{
+					i=rand.nextInt(3);
+					if(i!=1){
+						i1[pivot]=i;
+					}
+				}while(i1[pivot]==1);
+//				if(rand.nextInt(2)<1){
+//					i1[pivot]=0;
+//				}else{
+//					i1[pivot]=2;
+//				}
+				i2[pivot]=rand.nextInt(2)+1;
+			}else if(i1[pivot]==0&&i2[pivot]==1){
+				i1[pivot]=rand.nextInt(2)+1;
+				do{
+					i=rand.nextInt(3);
+					if(i!=1){
+						i2[pivot]=i;
+					}
+				}while(i2[pivot]==1);
+//				if(rand.nextInt(2)<1){
+//					i2[pivot]=0;
+//				}else{
+//					i2[pivot]=2;
+//				}
+			}
+			
+		}
+		
+		child1=changeToGAParameter(i1);
+		child2=changeToGAParameter(i2);
+		
+		return new GAParameter[] {child1,child2};		
+	}
 	public GAParameter[] mutate(GAParameter[] children){
 		GAParameter child1;
 		GAParameter child2;
+		int i;					//tempöre Variable.
 		
 		int[] i1=children[0].changeToIntarray(children[0]);
 		int[] i2=children[1].changeToIntarray(children[1]);
@@ -191,51 +321,87 @@ public class GAParameter {
 				i2[pivot]=rand.nextInt(2)+1;				
 			}else if(i1[pivot]==2&&i2[pivot]==1){
 				i1[pivot]=rand.nextInt(2);
-				if(rand.nextInt(2)<1){
-					i2[pivot]=0;
-				}else{
-					i2[pivot]=2;
-				}
+				do{
+					i=rand.nextInt(3);
+					if(i!=1){
+						i2[pivot]=i;
+					}
+				}while(i2[pivot]==1);
+//				if(rand.nextInt(2)<1){
+//					i2[pivot]=0;
+//				}else{
+//					i2[pivot]=2;
+//				}
 			}else if(i1[pivot]==1&&i2[pivot]==2){
-				if(rand.nextInt(2)<1){
-					i1[pivot]=0;
-				}else{
-					i1[pivot]=2;
-				}
+				do{
+					i=rand.nextInt(3);
+					if(i!=1){
+						i1[pivot]=i;
+					}
+				}while(i1[pivot]==1);
+//				if(rand.nextInt(2)<1){
+//					i1[pivot]=0;
+//				}else{
+//					i1[pivot]=2;
+//				}
 				i2[pivot]=rand.nextInt(2);
 			}else if(i1[pivot]==1&&i2[pivot]==1){
-				if(rand.nextInt(2)<1){
-					if(rand.nextInt(2)<1){
-						i1[pivot]=0;
-						i2[pivot]=2;
-					}else{
-						i1[pivot]=2;
-						i2[pivot]=0;
+				do{
+					i=rand.nextInt(3);
+					if(i!=1){
+						i1[pivot]=i;
 					}
-				}else{
-					if(rand.nextInt(2)<1){
-						i1[pivot]=0;
-						i2[pivot]=0;
-					}else{
-						i1[pivot]=2;
-						i2[pivot]=2;
+				}while(i1[pivot]==1);
+				do{
+					i=rand.nextInt(3);
+					if(i!=1){
+						i2[pivot]=i;
 					}
-				}
+				}while(i2[pivot]==1);
+//				if(rand.nextInt(2)<1){
+//					if(rand.nextInt(2)<1){
+//						i1[pivot]=0;
+//						i2[pivot]=2;
+//					}else{
+//						i1[pivot]=2;
+//						i2[pivot]=0;
+//					}
+//				}else{
+//					if(rand.nextInt(2)<1){
+//						i1[pivot]=0;
+//						i2[pivot]=0;
+//					}else{
+//						i1[pivot]=2;
+//						i2[pivot]=2;
+//					}
+//				}
 					
 			}else if(i1[pivot]==1&&i2[pivot]==0){
-				if(rand.nextInt(2)<1){
-					i1[pivot]=0;
-				}else{
-					i1[pivot]=2;
-				}
+				do{
+					i=rand.nextInt(3);
+					if(i!=1){
+						i1[pivot]=i;
+					}
+				}while(i1[pivot]==1);
+//				if(rand.nextInt(2)<1){
+//					i1[pivot]=0;
+//				}else{
+//					i1[pivot]=2;
+//				}
 				i2[pivot]=rand.nextInt(2)+1;
 			}else if(i1[pivot]==0&&i2[pivot]==1){
 				i1[pivot]=rand.nextInt(2)+1;
-				if(rand.nextInt(2)<1){
-					i2[pivot]=0;
-				}else{
-					i2[pivot]=2;
-				}
+				do{
+					i=rand.nextInt(3);
+					if(i!=1){
+						i2[pivot]=i;
+					}
+				}while(i2[pivot]==1);
+//				if(rand.nextInt(2)<1){
+//					i2[pivot]=0;
+//				}else{
+//					i2[pivot]=2;
+//				}
 			}
 			
 		}
@@ -244,7 +410,6 @@ public class GAParameter {
 		
 		return new GAParameter[] {child1,child2};		
 	}
-	
 	
 	
 	
