@@ -1,8 +1,9 @@
 
 import java.util.Random;
 import java.util.ArrayList;
+import java.io.*;
 
-public class Population {
+public class Population implements Serializable {
 	
 	GAParameter g;
 //	int action;
