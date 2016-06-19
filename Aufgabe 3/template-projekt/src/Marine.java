@@ -122,6 +122,7 @@ public class Marine {
 
 	private void move(Unit target) {
 //		if (target == null) {
+//			move(target);
 //			return;
 //		}
 //		System.out.println("move()");
@@ -165,13 +166,13 @@ public class Marine {
 		//Rule 1)
 		
 		Vector vr1;
-//		if(target != null){
-//			vr1 = new Vector(this.unit.getPosition(), target.getPosition());
-//		}
-//		else{
-			//Für Testen
+		if(target != null){
+			vr1 = new Vector(this.unit.getPosition(), target.getPosition());
+		}
+		else{
+			//Wenn keine Ziele, Laufe zur Mitte der Karte
 			 vr1= new Vector(this.unit.getPosition(), new Position(2048,1536));
-//		}
+		}
 		//Seperation
 		//Rule 2)
 

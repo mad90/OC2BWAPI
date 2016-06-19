@@ -36,10 +36,26 @@ public class Population implements Serializable {
 	//Benutzt man fitness, um Parents zu wählen. Muss man Population oder GAParameter nach fitness sortieren.
 	//!!!!!!!noch nicht fertig!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 	public GAParameter[] selectParents(){
+		GAParameter parent1 = null;
+		GAParameter parent2 = null;
+		int highestfitness = Integer.MIN_VALUE;
 		GAParameter[] parents=new GAParameter[2];
-		for(int i=0;i<2;i++){
-//			parents[i]=;
+		
+		for(GAParameter gap : this.arrayGA){
+			if(gap.getFitness() > highestfitness){
+				parent1 = gap;
+				highestfitness = gap.getFitness();
+			}
 		}
+		parents[0] = parent1;
+		
+		for(GAParameter gap : this.arrayGA){
+			if(gap.getFitness() > highestfitness && gap != parent1){
+				parent2 = gap;
+				highestfitness = gap.getFitness();
+			}
+		}
+		parents[1] = parent2;
 		return parents;
 	}
 	

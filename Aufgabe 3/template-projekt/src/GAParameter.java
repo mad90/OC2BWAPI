@@ -19,6 +19,7 @@ public class GAParameter implements Serializable {
 	int w_r4;			//Weight for rule 4
 	Random rand=new Random();
 	int gesamtHP;		//gesamt HP für unsere Marine Einheiten, um fitmess zu kalkulation. fitness=gesamtHP-lostHP.
+	int fitness;
 	ArrayList<GAParameter> arrayGA=new ArrayList<GAParameter>();		//jetzt noch unbenutzt, nur definiert. vllt um GAP. zu speichern.
 
 	//zwei Constructor für Klass GAParameter
@@ -508,5 +509,9 @@ public class GAParameter implements Serializable {
 	
 	public int getWr4(){
 		return this.w_r4;
+	}
+	
+	public int getFitness(){
+		return this.fitness;
 	}
 }
