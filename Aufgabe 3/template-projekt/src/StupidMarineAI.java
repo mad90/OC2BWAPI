@@ -53,6 +53,7 @@ public class StupidMarineAI extends DefaultBWListener implements Runnable {
 			i++;
 			System.out.println("Durchlauf "+ i);
 			m.step();
+			System.out.println("-----------------------------"+"\n");
 		}
 
 		if (frame % 1000 == 0) {

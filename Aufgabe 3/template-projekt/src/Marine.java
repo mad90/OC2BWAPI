@@ -70,7 +70,7 @@ public class Marine {
 		//Gibt alle eignene Marine in einem Radius um die Einheit zurück
 		HashSet<Unit> nearbyMarines = new HashSet<>();
 		for(Unit u : this.unit.getUnitsInRadius(radius)){
-			if(u.getType() == UnitType.Terran_Marine && u.getPlayer() ==  game.self()){
+			if(u.getType() == UnitType.Terran_Marine && u.getPlayer() ==  game.self() && u != this.unit){
 				nearbyMarines.add(u);
 			}
 		}
@@ -78,7 +78,7 @@ public class Marine {
 		
 	}
 	
-	public static Position getMediumPosition(HashSet<Unit> units){
+	public Position getMediumPosition(HashSet<Unit> units){
 		//Berechnet den Mittelpunkt zwischen den Postionen der Einheiten
 		int x = 0;
 		int y = 0;
@@ -92,9 +92,12 @@ public class Marine {
 		
 		x = (int)(x/units.size());
 		y = (int)(y/units.size());
+		return (new Position(x,y));
+		}
+		else{
+			return this.unit.getPosition();
 		}
 		
-		return (new Position(x,y));
 	}
 	
 	public static double getMediumAngle(HashSet<Unit> units){
@@ -152,7 +155,7 @@ public class Marine {
 		
 //		if(!this.unit.isMoving()){
 		this.unit.move(calculateMovePosition(target), false);
-		System.out.println("calculateMovePosition() ausgeführt!");
+//		System.out.println("calculateMovePosition() ausgeführt!");
 //		}
 	}
 	
@@ -167,39 +170,64 @@ public class Marine {
 //		}
 //		else{
 			//Für Testen
-			 vr1= new Vector(this.unit.getPosition(), new Position(1500,500));
+			 vr1= new Vector(this.unit.getPosition(), new Position(2048,1536));
 //		}
 		//Seperation
 		//Rule 2)
+
 		Vector vr2 = new Vector(0,0);
-		for(Unit u: getNearbyMarines(this.seperation)){
-			if(this.unit.getDistance(u) < this.seperation){
-				//Addiere Vektoren von zu nahen Einheiten zur eigenen Einheit auf
-				vr2 = vr2.add(new Vector(this.unit.getPosition(), u.getPosition()));
+		HashSet<Unit> sepmarines = getNearbyMarines(this.seperation);
+		if(!sepmarines.isEmpty()){
+			for(Unit u: sepmarines){
+				if(this.unit.getDistance(u) < this.seperation){
+					//Addiere Vektoren von zu nahen Einheiten zur eigenen Einheit auf
+					//TODO: Einheiten verklumpen
+					Vector tmpv = new Vector(u.getPosition(),this.unit.getPosition());
+					System.out.println("Vector Vr2 vor Addition mit tmpv: " + vr2.toString());
+					System.out.println("Vektor tmpv: "+ tmpv.toString());
+					vr2 = vr2.add(tmpv);
+					System.out.println("Vektor vr2: " + vr2.toString());
+					
+				}
 			}
+			System.out.println("Vektor Seperation: " + vr2.toString());
+//			vr2 = new Vector(this.unit.getPosition(), vr2.toPosition());
+//			System.out.println("Seperation Vektor + Position: " + vr2.toString());
 		}
+		else{
+			System.out.println("Keine Nahen Marines für Seperation!");
+		}
+		
+		//Den aufaddierten Vektor auf die aktuelle Position addieren
+
+		
 		//Cohesion
 		Vector vrcoh = new Vector(this.unit.getPosition(), getMediumPosition(getNearbyMarines(this.searchradius)));
+		System.out.println("Vektor Cohesion: "+vrcoh.toString());
 		
 		//Rule 3) In das Zentrum der geeignetsten Column bewegen
-		Position centcol = calculateBestCol();
-		Vector vr3 = new Vector(centcol.getX(), centcol.getY());
+		Vector vr3 = calculateBestCol();
+		System.out.println("Vektor Zentrum Column: " + vr3.toString());
 		
 		//Rule 4) In das Zentrum der geeignetsten Line bewegen
-		Position centlin = calculateBestLine();
-		Vector vr4 = new Vector(centlin.getX(), centlin.getY());
+		Vector vr4 = calculateBestLine();
+		
+		System.out.println("Vektor Zentrum Line: " + vr4.toString());
 		
 		
 		Vector pc = new Vector(this.unit.getPosition().getX(), this.unit.getPosition().getY());
-		if(getNearbyMarines(this.seperation).isEmpty()){
+//		System.out.println("Vector pc: " + pc.toString());
+		if(sepmarines.isEmpty()){
 			
 			Vector pcnew = pc.add((vr1.scalarMultiply(wr1a)),(vr3.scalarMultiply(wr3)),(vr4.scalarMultiply(wr4)));
+			System.out.println("pcnew vorher vor Normalisierung: " + pcnew.toString());
 			pcnew = pcnew.normalize().scalarMultiply(lengthmuliplier);
-//			System.out.println("pcnew vorher: " + pcnew.toString());
+			System.out.println("pcnew vorher nach Normalisierung: " + pcnew.toString());
 //			pcnew = new Vector(this.unit.getX(), this.unit.getY()).add(pcnew);
 			System.out.println("Aktuelle Position: " + this.unit.getPosition().toString());
-			System.out.println("Keine Seperation, Target Position: "+ pcnew.getX()+", " + pcnew.getY());
-			return new Position((int)(pcnew.getX()+this.unit.getX()),(int) (pcnew.getY()+this.unit.getY()));
+			Position newPos = new Position((int)(pcnew.getX()+this.unit.getX()),(int) (pcnew.getY()+this.unit.getY()));
+			System.out.println("Keine Seperation, Target Position: "+ newPos.toString());
+			return newPos;
 		}
 		else{
 			Vector pcnew= pc.add(vr2.scalarMultiply(wr2));
@@ -207,14 +235,16 @@ public class Marine {
 //			System.out.println("pcnew vorher: " + pcnew.toString());
 //			pcnew = new Vector(this.unit.getX(), this.unit.getY()).add(pcnew);
 			System.out.println("Aktuelle Position: " + this.unit.getPosition().toString());
-			System.out.println("Seperation, Target Position: "+ pcnew.getX()+", " + pcnew.getY());
-			return new Position((int)(pcnew.getX()+this.unit.getX()),(int) (pcnew.getY()+this.unit.getY()));
+			Position newPos = new Position((int)(pcnew.getX()+this.unit.getX()),(int) (pcnew.getY()+this.unit.getY()));
+			System.out.println("Seperation, Target Position: "+ newPos.toString());
+			return newPos;
 		}
 
 	}
 	
-	public Position calculateBestLine(){
+	public Vector calculateBestLine(){
 		//Berechnung der Bereiche der Linien (Bereiche horizontal)
+		System.out.println("----Start calculateBestLine()----");
 		int leftborder = this.unit.getPosition().getX() - this.searchradius;
 //		int rightborder = this.unit.getPosition().getX() + this.searchradius;
 		
@@ -227,7 +257,7 @@ public class Marine {
 //			System.out.println("Add new Line!");
 			alllines.add(new HashSet<Unit>());
 		}
-//		System.out.println("----------------");
+		System.out.println("Anzahl der HashSets in AllLines: "+ alllines.size());
 		
 		int ulin = 0;
 //		System.out.println("Anzahl der Nahen Marine "+getNearbyMarines(this.searchradius).size());
@@ -235,63 +265,94 @@ public class Marine {
 		for(Unit u : getNearbyMarines(this.searchradius)){
 			ulin = (int)((u.getPosition().getX() -leftborder)/((this.rlin*broadth)+(this.rlinsep*seperation)));
 //			System.out.println("Einheit befindet sich in Linie: "+ulin);
+//			System.out.println("AllLines hat "+alllines.size()+" HashSets!");
+			if(ulin == alllines.size()){
+				ulin--;
+			}
 			alllines.get(ulin).add(u);
 //			System.out.println("Einheit zur Linie "+ ulin+" hinzugefügt!" );
 		}
+//		System.out.println("Einheiten in HashSets hinzugefügt (Lines)!");
+		
+		
 		
 		//Bereich mit den meisten Einheiten auswählen
 		int tmphighest = Integer.MIN_VALUE;
+		int chosenlin = Integer.MIN_VALUE;
+		int i = 0;
 //		System.out.println("Anzahl der Reihen in AllLines" + alllines.size());
 		for(HashSet<Unit> lin : alllines){
+			
 //			System.out.println("tmphighest: "+ tmphighest+" Lin: "+ lin.size());
 			if(tmphighest < lin.size()){
 				tmphighest = lin.size();
+				chosenlin = i;
+				
 			}
+			i++;
 		}
-		System.out.println("Anzahl Einheiten in Line mit den Meisten: " + alllines.get(tmphighest).size());
-		if(tmphighest != Integer.MIN_VALUE){
-		return getMediumPosition(alllines.get(tmphighest));
+		System.out.println("Anzahl Einheiten in Line mit den Meisten: " + alllines.get(chosenlin).size());
+		if(chosenlin != Integer.MIN_VALUE){
+		//Ergebnis als Vector von Eigener Einheit zum Ziel
+		Position bestlinepos = getMediumPosition(alllines.get(chosenlin));
+		return new Vector(this.unit.getPosition(), bestlinepos);
 		}
-		else return this.unit.getPosition();
+		else return new Vector(0,0);
 		
 	}
 		
 	
 	
-	public Position calculateBestCol(){
+	public Vector calculateBestCol(){
+		//Sollte laut Tests funktionieren
+		System.out.println("----Beginn calculateBestCol()----");
 		//Berechnung der Zeilen (Bereiche vertikal)
+		//(0/0) Top left
 		int topborder = this.unit.getPosition().getY() - this.searchradius;
 //		int botborder = this.unit.getPosition().getY() + this.searchradius;
 		
 		int nbrcol = (int)((this.searchradius*2)/((this.rcol*broadth)+(this.rcolsep*seperation)));
+//		System.out.println("Anzahl der Columns: " +nbrcol); //Bis hier korrekt
 		//Zum Speichern der Anzahl der Einheiten in Column
 		ArrayList<HashSet<Unit>> allcolumns = new ArrayList<HashSet<Unit>>();
 		
 		for(int i = 0;i < nbrcol; i++){
 			allcolumns.add(new HashSet<Unit>());
 		}
-		
+//		System.out.println("Anzahl der Colums im HashSet: "+allcolumns.size()); //Funktioniert
 		int ucol = 0;
 		//Zähle Einheiten in den einzelnen Bereichen
 		for(Unit u : getNearbyMarines(this.searchradius)){
 			ucol = (int)((u.getPosition().getY() - topborder)/((this.rcol*broadth)+(this.rcolsep*seperation)));
+//			System.out.println("Ucol ist "+ucol);
+			if(ucol == allcolumns.size()){
+				ucol--;
+			}
 			allcolumns.get(ucol).add(u);
 		}
-		
+		System.out.println("Einheiten in HashSets hinzugefügt!");//Funktioniert
 		//Bereich mit den meisten Einheiten auswählen
 		int tmphighest = Integer.MIN_VALUE;
+		int chosencol = Integer.MIN_VALUE;
+		int i = 0;
 		for(HashSet<Unit> col : allcolumns){
-			if(tmphighest < col.size()){
+			if(tmphighest < col.size())
+			{
+//				System.out.println("Col.size()" + col.size());
 				tmphighest = col.size();
+				chosencol = i;
 			}
+			i++;
 		}
-		System.out.println("Anzahl Einheiten in Spalte mit den Meisten: " + allcolumns.get(tmphighest).size());
+		System.out.println("Anzahl Einheiten in Spalte mit den Meisten: " + allcolumns.get(chosencol).size());
 		
 		//
-		if(tmphighest != Integer.MIN_VALUE){
-		return getMediumPosition(allcolumns.get(tmphighest));
+		if(chosencol != Integer.MIN_VALUE){
+		Position bestcolpos = getMediumPosition(allcolumns.get(chosencol));
+		return new Vector(this.unit.getPosition(), bestcolpos);
 		}
-		else return this.unit.getPosition();
+		//Nullvektor wenn eine Colums
+		else return new Vector(0,0);
 	}
 	
 
