@@ -2,9 +2,10 @@
 import java.util.Random;
 import java.util.Scanner;
 
-import XCSPackage.PopulationEntry;
+
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.io.*;
 
 public class Population implements Serializable {
@@ -23,23 +24,25 @@ public class Population implements Serializable {
 	
 	
 	public Population(){
+		//Erstellt eine Population mit einem zufälligen GAParameter
 		this.arrayGA.add(new GAParameter());
 	}
 	//,int action,float predict,float predictError
 	public Population(ArrayList<GAParameter> g){
 		this.arrayGA=g;
-//		this.g=g;
-//		this.predict=predict;
-//		this.predictError=predictError;
-//		this.action=action;
-//		this.fitness=fitness;
-//		this.crossoverRate=crossover;
-//		this.mutationRate=mutation;
+
+	}
+	
+	public Population(GAParameter... gaparameter){
+		//Kontruktor der beliebig viele GAParameter annehmen kann
+		for(GAParameter g: gaparameter){
+			this.arrayGA.add(g);
+		}
 	}
 	
 	//parents suchen, um crossover und mutation auszuführen
 	//Benutzt man fitness, um Parents zu wählen. Muss man Population oder GAParameter nach fitness sortieren.
-	//!!!!!!!noch nicht fertig!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+
 	public GAParameter[] selectParents(){
 		GAParameter parent1 = null;
 		GAParameter parent2 = null;
@@ -76,7 +79,8 @@ public class Population implements Serializable {
 		wenn crossover kann nicht ausführen, kann mutation noch einzig ausführen.
 	 * 
 	 */
-	public GAParameter[] evolve(GAParameter parent1,GAParameter parent2){
+	public static GAParameter[] evolve(GAParameter parent1,GAParameter parent2){
+		Random rand=new Random();
 		GAParameter[] gaChildren;
 		GAParameter child=new GAParameter();
 		GAParameter[] children={parent1,parent2};
@@ -98,7 +102,8 @@ public class Population implements Serializable {
 		}
 		return gaChildren;
 	}	
-	public GAParameter[] evolve(GAParameter[] parent12){
+	public static GAParameter[] evolve(GAParameter[] parent12){
+		Random rand=new Random();
 		GAParameter[] gaChildren;
 		GAParameter child=new GAParameter();
 		GAParameter[] children=new GAParameter[2];
@@ -129,53 +134,140 @@ public class Population implements Serializable {
 	public void writeToFlatFile() throws FileNotFoundException{
 		try(  PrintWriter out = new PrintWriter("Population.txt")  ){
 			
-			String s = "";
-			for(GAParameter e: this.arrayGA){
-				s+=e.toString();
-								
-				
-			}
+			String s = toString();
 			out.println(s);
 		}
 		
 	}
 	
-	public ArrayList<GAParameter> readFromFlatFile() throws FileNotFoundException{
+	public static ArrayList<GAParameter> readFromFlatFile() throws FileNotFoundException{
 		ArrayList<GAParameter> populationList = new ArrayList<GAParameter>();
 		
-		boolean notEnd = false;
+		boolean notEnd = true;
 		Scanner file = new Scanner(new File("Population.txt"));
+//		file.nextLine();
+//		System.out.println("hasNextLine(): " + file.hasNextLine());
+
 		while(file.hasNextLine()&& notEnd){
-		
-			String split[] = file.nextLine().split(", ");
+			String split[] = file.nextLine().split(" ");
+//			System.out.println("Split[0] " + split[0]);
+//			System.out.println("Split[] length: " + split.length);
 			
 //			int d = Integer.parseInt(split[0]);
 //			int c = Integer.parseInt(split[1]);
 //			int a = Integer.parseInt(split[2]);
 			double[] dGA=new double[11];
-			
+//			System.out.println("Erster Double: " + dGA[0]);
+			if(!split[0].isEmpty()){
 			for(int i=0;i<dGA.length;i++){
 				dGA[i]=Double.parseDouble(split[i]);
 			}
-			int f=Integer.parseInt(split[dGA.length]);
-			
-			
+			int f = Integer.parseInt(split[dGA.length]);
+			populationList.add(new GAParameter(dGA,f));
+//			System.out.println("hasNextLine(): "+file.hasNextLine());
+//			file.nextLine();
+			if(!file.hasNextLine()){
+				notEnd = false;
+			}
+//			file.nextLine();
+			}
+			else{
+				return populationList;
+			}
 //			
 //			double p = Double.parseDouble(split[3]);
 //			double pe =  Double.parseDouble(split[4]);
 //			double f =  Double.parseDouble(split[5]);
-			GAParameter e = new GAParameter();
+
 			
-			populationList.add(e);
-			System.out.println("Zeile eingelesen!");
+
 			
-			if(!file.hasNextLine()){
-				notEnd = false;
+		}
+		return populationList;
+	}
+	
+	public static void appendToFlatFile(GAParameter... gap){
+		try
+		{
+		    String filename= "Population.txt";
+		    FileWriter fw = new FileWriter(filename,true); //the true will append the new data
+		    for(GAParameter g: gap){
+		    	fw.write(g.toString());//appends the string to the file
+		    }
+		    fw.close();
+		}
+		catch(IOException ioe)
+		{
+		    System.err.println("IOException: " + ioe.getMessage());
+		}
+		
+		
+		
+	}
+	
+	public static int getNumberOfEntriesInFlatFile(){
+		try {
+			Scanner file = new Scanner(new File("Population.txt"));
+			boolean notEnd = true;
+			int i = 0;
+			while(file.hasNextLine() && notEnd){
+				i++;
+				if(!file.hasNextLine()){
+					notEnd = false;
+				}
+				else{
+					file.nextLine();
+				}
+			}
+			return i-1;
+		} catch (Exception e) {
+			// TODO Auto-generated catch block
+			return 0;
+		}
+	}
+	
+	public GAParameter chooseGAParameter(){
+		int totalFitness = 0;
+		int[] keyareas = new int[this.getArrayGA().size()];
+		HashMap<Integer,GAParameter> hashmap = new HashMap<Integer, GAParameter>();
+		int i = 0;
+		Random random = new Random();
+		
+		for(GAParameter gap: this.arrayGA){
+			totalFitness += gap.getFitness();
+			hashmap.put(totalFitness, gap);
+			keyareas[i] = totalFitness;
+			i++;
+		}
+		int chosen = random.nextInt(totalFitness);
+		int key = Integer.MIN_VALUE;
+		
+		for(i = 0; i <= keyareas.length; i++){
+			if(chosen < keyareas[i]){
+				key= keyareas[i];
+				break;
 			}
 			
-
-
+		}
+		
+		if(key != Integer.MIN_VALUE){
+			return hashmap.get(key);
+		}
+		else{
+			return null;
+		}
+		
 	}
+	
+	public void checkMutation(){
+		if(rand.nextDouble() > this.mutationRate){
+			
+			
+		}
+	}
+	
+	
+	
 	
 	public ArrayList<GAParameter> getArrayGA() {
 		return arrayGA;
@@ -183,41 +275,10 @@ public class Population implements Serializable {
 	public void setArrayGA(ArrayList<GAParameter> arrayGA) {
 		this.arrayGA = arrayGA;
 	}
+	
+	
 
-	//set Methode
-//	public double setCrossover(double crossover) {
-//		this.crossoverRate=crossover;
-//		return this.crossoverRate;
-//	}
-//	public double setMutation(double mutation) {
-//		this.mutationRate=mutation;
-//		return this.mutationRate;
-//	}
-	
-	
-	//get Methode
-//	public GAParameter getGAParameter(){
-//		return this.g;
-//	}	
-//	public int getAction(){
-//		return this.action;
-//	}
-//	public float getPredict(){
-//		return this.predict;
-//	}
-//	public float getPredictError(){
-//		return this.predictError;
-//	}	
-//	public int getFitness(){
-//		return this.fitness;
-//	}	
-//	public double getCrossover() {
-//		return this.crossoverRate;
-//	}
-//	public double getMutation() {
-//		return this.mutationRate;
-//	}
-//	
+
 	
 	
 	

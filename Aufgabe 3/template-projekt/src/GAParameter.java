@@ -26,16 +26,52 @@ public class GAParameter implements Serializable {
 	//zwei Constructor für Klass GAParameter
 	public GAParameter(){
 		r_sig=rand.nextDouble();
+		while(r_sig == 0){
+			r_sig=rand.nextDouble();
+		}
 		r_sep=rand.nextDouble();
+		while(r_sep == 0){
+			r_sep=rand.nextDouble();
+		}
 		r_col=rand.nextDouble();
+		while(r_col == 0){
+			r_col=rand.nextDouble();
+		}
 		r_col_sep=rand.nextDouble();
+		while(r_col_sep == 0){
+			r_col_sep=rand.nextDouble();
+		}
 		r_lin=rand.nextDouble();
+		while(r_lin == 0){
+			r_lin=rand.nextDouble();
+		}
 		r_lin_sep=rand.nextDouble();
+		while(r_lin_sep == 0){
+			r_lin_sep=rand.nextDouble();
+		}
+		
+		
 		w_r1_a=rand.nextDouble()+1;
+		while(w_r1_a == 0){
+			w_r1_a=rand.nextDouble()+1;
+		}
 		w_r1_b=rand.nextDouble()+1;
+		while(w_r1_b == 0){
+			w_r1_b=rand.nextDouble()+1;
+		}
 		w_r2=rand.nextDouble()+1;
+		while(w_r2 == 0){
+			w_r2=rand.nextDouble()+1;
+		}
 		w_r3=rand.nextDouble()+1;
-		w_r4=rand.nextDouble()+1;		
+		while(w_r3 == 0){
+			w_r3=rand.nextDouble()+1;
+		}
+		w_r4=rand.nextDouble()+1;
+		while(w_r4 == 0){
+			w_r4=rand.nextDouble()+1;
+		}
+		
 	}	
 	public GAParameter(double rsig,double rsep,double rcol,double rcolsep,double rlin,double rlinsep,double wr1a,double wr1b,double wr2,double wr3,double wr4){
 		this.r_sig=rsig;
@@ -193,19 +229,7 @@ public class GAParameter implements Serializable {
 				i=rand.nextDouble();
 			}
 			i2[pivot]=i;
-//			if(i1[pivot]==1&&i2[pivot]==1){
-//				i1[pivot]=0;
-//				i2[pivot]=0;
-//			}else if(i1[pivot]==0&&i2[pivot]==1){
-//				i1[pivot]=1;
-//				i2[pivot]=0;
-//			}else if(i1[pivot]==1&&i2[pivot]==0){
-//				i1[pivot]=0;
-//				i2[pivot]=1;
-//			}else{
-//				i1[pivot]=1;
-//				i2[pivot]=1;
-//			}
+
 		}else{
 			i=rand.nextDouble()+1;
 			while(i1[pivot]==i){
@@ -218,103 +242,7 @@ public class GAParameter implements Serializable {
 			}
 			i2[pivot]=i;
 		
-//			if(i1[pivot]==2&&i2[pivot]==2){
-//				i1[pivot]=rand.nextInt(2);
-//				i2[pivot]=rand.nextInt(2);
-//			}else if(i1[pivot]==0&&i2[pivot]==0){
-//				i1[pivot]=rand.nextInt(2)+1;
-//				i2[pivot]=rand.nextInt(2)+1;
-//			}else if(i1[pivot]==0&&i2[pivot]==2){
-//				i1[pivot]=rand.nextInt(2)+1;
-//				i2[pivot]=rand.nextInt(2);
-//			}else if(i1[pivot]==2&&i2[pivot]==0){
-//				i1[pivot]=rand.nextInt(2);
-//				i2[pivot]=rand.nextInt(2)+1;				
-//			}else if(i1[pivot]==2&&i2[pivot]==1){
-//				i1[pivot]=rand.nextInt(2);
-//				do{
-//					i=rand.nextInt(3);
-//					if(i!=1){
-//						i2[pivot]=i;
-//					}
-//				}while(i2[pivot]==1);
-////				if(rand.nextInt(2)<1){
-////					i2[pivot]=0;
-////				}else{
-////					i2[pivot]=2;
-////				}
-//			}else if(i1[pivot]==1&&i2[pivot]==2){
-//				do{
-//					i=rand.nextInt(3);
-//					if(i!=1){
-//						i1[pivot]=i;
-//					}
-//				}while(i1[pivot]==1);
-////				if(rand.nextInt(2)<1){
-////					i1[pivot]=0;
-////				}else{
-////					i1[pivot]=2;
-////				}
-//				i2[pivot]=rand.nextInt(2);
-//			}else if(i1[pivot]==1&&i2[pivot]==1){
-//				do{
-//					i=rand.nextInt(3);
-//					if(i!=1){
-//						i1[pivot]=i;
-//					}
-//				}while(i1[pivot]==1);
-//				do{
-//					i=rand.nextInt(3);
-//					if(i!=1){
-//						i2[pivot]=i;
-//					}
-//				}while(i2[pivot]==1);
-////				if(rand.nextInt(2)<1){
-////					if(rand.nextInt(2)<1){
-////						i1[pivot]=0;
-////						i2[pivot]=2;
-////					}else{
-////						i1[pivot]=2;
-////						i2[pivot]=0;
-////					}
-////				}else{
-////					if(rand.nextInt(2)<1){
-////						i1[pivot]=0;
-////						i2[pivot]=0;
-////					}else{
-////						i1[pivot]=2;
-////						i2[pivot]=2;
-////					}
-////				}
-//					
-//			}else if(i1[pivot]==1&&i2[pivot]==0){
-//				do{
-//					i=rand.nextInt(3);
-//					if(i!=1){
-//						i1[pivot]=i;
-//					}
-//				}while(i1[pivot]==1);
-////				if(rand.nextInt(2)<1){
-////					i1[pivot]=0;
-////				}else{
-////					i1[pivot]=2;
-////				}
-//				i2[pivot]=rand.nextInt(2)+1;
-//			}else if(i1[pivot]==0&&i2[pivot]==1){
-//				i1[pivot]=rand.nextInt(2)+1;
-//				do{
-//					i=rand.nextInt(3);
-//					if(i!=1){
-//						i2[pivot]=i;
-//					}
-//				}while(i2[pivot]==1);
-////				if(rand.nextInt(2)<1){
-////					i2[pivot]=0;
-////				}else{
-////					i2[pivot]=2;
-////				}
-//			}
-//			
+	
 		}
 		
 		child1=changeToGAParameter(i1);
@@ -341,18 +269,7 @@ public class GAParameter implements Serializable {
 				i=rand.nextDouble();
 			}
 			i2[pivot]=i;
-//			if(i1[pivot]==1&&i2[pivot]==1){
-//				i1[pivot]=0;
-//				i2[pivot]=0;
-//			}else if(i1[pivot]==0&&i2[pivot]==1){
-//				i1[pivot]=1;
-//				i2[pivot]=0;
-//			}else if(i1[pivot]==1&&i2[pivot]==0){
-//				i1[pivot]=0;
-//				i2[pivot]=1;
-//			}else{
-//				i1[pivot]=1;
-//				i2[pivot]=1;
+
 //			}
 		}else{
 			i=rand.nextDouble()+1;
@@ -365,103 +282,7 @@ public class GAParameter implements Serializable {
 				i=rand.nextDouble()+1;
 			}
 			i2[pivot]=i;
-//			if(i1[pivot]==2&&i2[pivot]==2){
-//				i1[pivot]=rand.nextInt(2);
-//				i2[pivot]=rand.nextInt(2);
-//			}else if(i1[pivot]==0&&i2[pivot]==0){
-//				i1[pivot]=rand.nextInt(2)+1;
-//				i2[pivot]=rand.nextInt(2)+1;
-//			}else if(i1[pivot]==0&&i2[pivot]==2){
-//				i1[pivot]=rand.nextInt(2)+1;
-//				i2[pivot]=rand.nextInt(2);
-//			}else if(i1[pivot]==2&&i2[pivot]==0){
-//				i1[pivot]=rand.nextInt(2);
-//				i2[pivot]=rand.nextInt(2)+1;				
-//			}else if(i1[pivot]==2&&i2[pivot]==1){
-//				i1[pivot]=rand.nextInt(2);
-//				do{
-//					i=rand.nextInt(3);
-//					if(i!=1){
-//						i2[pivot]=i;
-//					}
-//				}while(i2[pivot]==1);
-////				if(rand.nextInt(2)<1){
-////					i2[pivot]=0;
-////				}else{
-////					i2[pivot]=2;
-////				}
-//			}else if(i1[pivot]==1&&i2[pivot]==2){
-//				do{
-//					i=rand.nextInt(3);
-//					if(i!=1){
-//						i1[pivot]=i;
-//					}
-//				}while(i1[pivot]==1);
-////				if(rand.nextInt(2)<1){
-////					i1[pivot]=0;
-////				}else{
-////					i1[pivot]=2;
-////				}
-//				i2[pivot]=rand.nextInt(2);
-//			}else if(i1[pivot]==1&&i2[pivot]==1){
-//				do{
-//					i=rand.nextInt(3);
-//					if(i!=1){
-//						i1[pivot]=i;
-//					}
-//				}while(i1[pivot]==1);
-//				do{
-//					i=rand.nextInt(3);
-//					if(i!=1){
-//						i2[pivot]=i;
-//					}
-//				}while(i2[pivot]==1);
-////				if(rand.nextInt(2)<1){
-////					if(rand.nextInt(2)<1){
-////						i1[pivot]=0;
-////						i2[pivot]=2;
-////					}else{
-////						i1[pivot]=2;
-////						i2[pivot]=0;
-////					}
-////				}else{
-////					if(rand.nextInt(2)<1){
-////						i1[pivot]=0;
-////						i2[pivot]=0;
-////					}else{
-////						i1[pivot]=2;
-////						i2[pivot]=2;
-////					}
-////				}
-//					
-//			}else if(i1[pivot]==1&&i2[pivot]==0){
-//				do{
-//					i=rand.nextInt(3);
-//					if(i!=1){
-//						i1[pivot]=i;
-//					}
-//				}while(i1[pivot]==1);
-////				if(rand.nextInt(2)<1){
-////					i1[pivot]=0;
-////				}else{
-////					i1[pivot]=2;
-////				}
-//				i2[pivot]=rand.nextInt(2)+1;
-//			}else if(i1[pivot]==0&&i2[pivot]==1){
-//				i1[pivot]=rand.nextInt(2)+1;
-//				do{
-//					i=rand.nextInt(3);
-//					if(i!=1){
-//						i2[pivot]=i;
-//					}
-//				}while(i2[pivot]==1);
-////				if(rand.nextInt(2)<1){
-////					i2[pivot]=0;
-////				}else{
-////					i2[pivot]=2;
-////				}
-//			}
-			
+
 		}
 		child1=changeToGAParameter(i1);
 		child2=changeToGAParameter(i2);
@@ -470,7 +291,7 @@ public class GAParameter implements Serializable {
 	}
 	
 	public String toString(){
-		String s =this.r_sig+", " +this.r_sep+", "+this.r_col+", "+this.r_col_sep+", "+this.r_lin+", "+this.r_lin_sep+", "+this.w_r1_a+", "+this.w_r1_b+", "+this.w_r2+", "+this.w_r3+", "+this.w_r4+", "+this.fitness+"\n";
+		String s = this.r_sig+" " +this.r_sep+" "+this.r_col+" "+this.r_col_sep+" "+this.r_lin+" "+this.r_lin_sep+" "+this.w_r1_a+" "+this.w_r1_b+" "+this.w_r2+" "+this.w_r3+" "+this.w_r4+" "+this.fitness+"\r\n";
 		return s;
 	}
 	
@@ -552,6 +373,7 @@ public class GAParameter implements Serializable {
 	public void setFitness(int fitness) {
 		this.fitness = fitness;
 	}
+
 	
 	
 	
