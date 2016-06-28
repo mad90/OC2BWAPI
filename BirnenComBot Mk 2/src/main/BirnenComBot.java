@@ -3,24 +3,58 @@ package main;
 import java.util.ArrayList;
 import java.util.HashSet;
 
-import bwapi.*;
-import bwta.*;
-import unitManager.*;
+import bwapi.DefaultBWListener;
+import bwapi.Game;
+import bwapi.Mirror;
+import bwapi.Player;
+import bwapi.Position;
+import bwapi.Unit;
+import bwapi.UnitType;
+import bwta.BWTA;
+import unitManager.MarineManager;
+import unitManager.MedicManager;
+import unitManager.SiegeTankManager;
+import unitManager.UnitManager;
+import unitManager.VultureManager;
 
 public class BirnenComBot  extends DefaultBWListener implements Runnable{
 	
-	private Mirror mirror = new Mirror();
+	private Mirror mirror;
 	
     private Game game;
     private Player self;
 	
-	public HashSet<UnitManager> myunits = new HashSet<UnitManager>();
-	public HashSet<Unit> mybuildings = new HashSet<Unit>();
-	public HashSet<Unit> enemyunits = new HashSet<Unit>();
+	public HashSet<UnitManager> myunits;
+	public HashSet<Unit> mybuildings;
+	public HashSet<Unit> enemyunits;
 
-    private ArrayList<Position> posenemybuild = new ArrayList<>();
+    private ArrayList<Position> posenemybuild;
     
     boolean startleft;
+    
+    //Offensiver/Defensiver Modus
+    boolean offensive = true;
+    
+	public BirnenComBot(){
+		System.out.println("BirnenComBot ready for duty!");
+		this.mirror  = new Mirror();
+		this.myunits = new HashSet<UnitManager>();
+		this.mybuildings = new HashSet<Unit>();
+		this.enemyunits = new HashSet<Unit>();
+
+	    this.posenemybuild = new ArrayList<>();
+
+	
+	}
+    
+    
+    
+	public static void main(String[] args){
+		new BirnenComBot().run();
+	}
+	
+	
+    
     
     @Override
     public void run() {
@@ -42,11 +76,15 @@ public class BirnenComBot  extends DefaultBWListener implements Runnable{
         BWTA.readMap();
         BWTA.analyze();
         System.out.println("Map data ready");
+        initializeStart();
+        System.out.println("Initialisiere Start");
         
     }
     
 	@Override
 	public void onFrame() {
+		
+		step();
 
 	}
 	
@@ -77,9 +115,12 @@ public class BirnenComBot  extends DefaultBWListener implements Runnable{
 	
 	@Override
 	public void onUnitCreate(Unit unit) {
-		if(!unit.getPlayer().equals(this.self) && !unit.getType().equals(UnitType.Terran_Supply_Depot) && !this.enemyunits.contains(unit)){
+		if(!unit.getPlayer().equals(this.self) && !unit.getType().equals(UnitType.Terran_Supply_Depot)/* && !this.enemyunits.contains(unit)*/){
 			this.enemyunits.add(unit);
 			
+		}
+		else if(unit.getPlayer().equals(this.self) && unit.getType().equals(UnitType.Terran_Supply_Depot)){
+			this.mybuildings.add(unit);
 		}
 	}
 	
@@ -115,7 +156,15 @@ public class BirnenComBot  extends DefaultBWListener implements Runnable{
 	}
     
     
-    
+    public void step(){
+    	//Ruft die doStep() Funktion für jeden Manager in myUnits auf
+    	
+    	for(UnitManager um: myunits){
+    		System.out.println("Step()");
+    		um.doStep(getOffensive());
+    	}
+    	
+    }
     
 
     
@@ -135,30 +184,36 @@ public class BirnenComBot  extends DefaultBWListener implements Runnable{
     
     
     public void initializeStart(){
-    	//Initialisiert eigene Startposition, sowie die UnitManager
-    	StartPosIsLeft();
+    	//Initialisiert eigene UnitManager
+    	
+    	for(Unit u: self.getUnits()){
+    		if(u.getType() == UnitType.Terran_Supply_Depot){
+    			mybuildings.add(u);
+    		}
+    		
+    	}
+    	System.out.println("Size mybuildings"+ mybuildings.size());
+    	startPosIsLeft();
+    	System.out.println("StartPos ist links: " + getStartLeft());
+    	
+
     	
         for (Unit u: self.getUnits()){
-        	if(!myunits.contains(u)){
-        		
-        		if(u.getType() != UnitType.Terran_Supply_Depot){
-        			if(u.getType() == UnitType.Terran_Marine){
-        				myunits.add(new MarineManager(u));
+        	if(u.getType() != UnitType.Buildings &&!myunits.contains(u)){
+        		    if(u.getType() == UnitType.Terran_Marine){
+        				myunits.add(new MarineManager(u, getStartLeft(), this.self));
         			}
         			else if(u.getType() == UnitType.Terran_Medic){
-        				myunits.add(new MedicManager(u));
+        				myunits.add(new MedicManager(u, getStartLeft(), this.self));
         			}
         			else if(u.getType() == UnitType.Terran_Siege_Tank_Tank_Mode){
-        				myunits.add(new SiegeTankManager(u));
+        				myunits.add(new SiegeTankManager(u, getStartLeft(), this.self));
         			}
         			else if(u.getType() == UnitType.Terran_Vulture){
-        				myunits.add(new VultureManager(u));
+        				myunits.add(new VultureManager(u, getStartLeft(), this.self));
         			}
         		}
-        		else{
-        			mybuildings.add(u);
-        		}
-        	}
+        	
         }
     	
     	
@@ -176,10 +231,11 @@ public class BirnenComBot  extends DefaultBWListener implements Runnable{
     	}
     }
     
-    public void StartPosIsLeft(){
+    public void startPosIsLeft(){
     	//Prüft ob man auf der Karte links startet und setzt startLeft entsprechend
     	boolean left = false;
     	for(Unit u: this.mybuildings){
+    		System.out.println(u.toString());
     		if(u.getPosition().getX() == 624 && (u.getPosition().getY() == 384 || u.getPosition().getY() == 2752 )){
     			left=true;
     		}
@@ -194,6 +250,12 @@ public class BirnenComBot  extends DefaultBWListener implements Runnable{
     public boolean getStartLeft(){
     	return this.startleft;
     }
+    
+    public boolean getOffensive(){
+    	return this.offensive;
+    }
+    
+
     
     
 	
