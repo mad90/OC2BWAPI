@@ -2,6 +2,7 @@ package main;
 
 import java.util.ArrayList;
 import java.util.HashSet;
+import java.util.List;
 
 import javax.swing.colorchooser.ColorSelectionModel;
 
@@ -14,12 +15,14 @@ import bwapi.Position;
 import bwapi.Unit;
 import bwapi.UnitType;
 import bwta.BWTA;
+import bwta.Chokepoint;
 import bwta.Region;
 import unitManager.MarineManager;
 import unitManager.MedicManager;
 import unitManager.SiegeTankManager;
 import unitManager.UnitManager;
 import unitManager.VultureManager;
+import utilities.Node;
 
 public class BirnenComBot  extends DefaultBWListener implements Runnable{
 	
@@ -31,8 +34,10 @@ public class BirnenComBot  extends DefaultBWListener implements Runnable{
 	public HashSet<UnitManager> myunits;
 	public HashSet<Unit> mybuildings;
 	public HashSet<Unit> enemyunits;
-
+	public HashSet<Node> nodes;
+	
     private ArrayList<Position> posenemybuild;
+    
     
     boolean startleft;
     
@@ -45,6 +50,8 @@ public class BirnenComBot  extends DefaultBWListener implements Runnable{
 		this.myunits = new HashSet<UnitManager>();
 		this.mybuildings = new HashSet<Unit>();
 		this.enemyunits = new HashSet<Unit>();
+		
+		
 
 	    this.posenemybuild = new ArrayList<>();
 
@@ -193,6 +200,14 @@ public class BirnenComBot  extends DefaultBWListener implements Runnable{
     
     public void initializeStart(){
     	//Initialisiert eigene UnitManager
+    	List<Chokepoint> cp = BWTA.getChokepoints();
+    	
+    	for(bwapi.Region r : game.getAllRegions()){
+    		this.nodes.add(new Node(r, cp, this.game));
+    		    		
+    	}
+    	
+    	
     	
     	for(Unit u: self.getUnits()){
     		if(u.getType() == UnitType.Terran_Supply_Depot){
@@ -264,11 +279,32 @@ public class BirnenComBot  extends DefaultBWListener implements Runnable{
     }
     
     public void drawRegions(){
-    	for(bwapi.Region r : game.getAllRegions()){
+    	List<Region> regions = BWTA.getRegions();
+    	List<Chokepoint> cp = BWTA.getChokepoints();
+    	boolean choke = false;
+    	
+//    	System.out.println("Anzahl der Gefunden Chokepoints: " + cp.size());
+    	
+    	for(Region r : regions){
+    		choke = false;
+
+    		if(choke){
+    			game.drawBoxMap(r., r.getBoundsTop(), r.getBoundsRight(), r.getBoundsBottom(), Color.Red);
+    			game.draw
+    		
+    		}
+
     		game.drawBoxMap(r.getBoundsLeft(), r.getBoundsTop(), r.getBoundsRight(), r.getBoundsBottom(), Color.Yellow);
+    		
     		game.drawTextMap(r.getCenter(), "Region ["+r.getCenter().getX()+", "+ r.getCenter().getY()+"] DefensePriority: " + r.getDefensePriority());
     		
 
+    	}
+    	
+    	for(Chokepoint c: cp){
+    		c.
+    		game.drawTextMap(c.getCenter(), "Chokepoint: " + c.getCenter().toString());
+    		
     	}
     	
     	
