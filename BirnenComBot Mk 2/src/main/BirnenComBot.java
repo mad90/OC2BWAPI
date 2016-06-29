@@ -3,6 +3,9 @@ package main;
 import java.util.ArrayList;
 import java.util.HashSet;
 
+import javax.swing.colorchooser.ColorSelectionModel;
+
+import bwapi.Color;
 import bwapi.DefaultBWListener;
 import bwapi.Game;
 import bwapi.Mirror;
@@ -11,6 +14,7 @@ import bwapi.Position;
 import bwapi.Unit;
 import bwapi.UnitType;
 import bwta.BWTA;
+import bwta.Region;
 import unitManager.MarineManager;
 import unitManager.MedicManager;
 import unitManager.SiegeTankManager;
@@ -79,10 +83,14 @@ public class BirnenComBot  extends DefaultBWListener implements Runnable{
         initializeStart();
         System.out.println("Initialisiere Start");
         
+        
+        
+        
     }
     
 	@Override
 	public void onFrame() {
+		drawRegions();
 		
 		step();
 
@@ -253,6 +261,17 @@ public class BirnenComBot  extends DefaultBWListener implements Runnable{
     
     public boolean getOffensive(){
     	return this.offensive;
+    }
+    
+    public void drawRegions(){
+    	for(bwapi.Region r : game.getAllRegions()){
+    		game.drawBoxMap(r.getBoundsLeft(), r.getBoundsTop(), r.getBoundsRight(), r.getBoundsBottom(), Color.Yellow);
+    		game.drawTextMap(r.getCenter(), "Region ["+r.getCenter().getX()+", "+ r.getCenter().getY()+"] DefensePriority: " + r.getDefensePriority());
+    		
+
+    	}
+    	
+    	
     }
     
 
