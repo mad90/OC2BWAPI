@@ -15,6 +15,7 @@ public class Node {
 	Position chokeposition;
 	
 	public Node(bwapi.Region region, List<Chokepoint> chokepoints, Game game){
+		//TODO: Testen ob Chokepoints korrekt erkannt werden
 		
 		this.region = region;
 		Iterator<Chokepoint> it = chokepoints.iterator();

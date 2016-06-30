@@ -279,35 +279,25 @@ public class BirnenComBot  extends DefaultBWListener implements Runnable{
     }
     
     public void drawRegions(){
-    	List<Region> regions = BWTA.getRegions();
-    	List<Chokepoint> cp = BWTA.getChokepoints();
-    	boolean choke = false;
+    	//TODO: Testen
+
     	
 //    	System.out.println("Anzahl der Gefunden Chokepoints: " + cp.size());
     	
-    	for(Region r : regions){
-    		choke = false;
+    	for(Node n : nodes){
 
-    		if(choke){
-    			game.drawBoxMap(r., r.getBoundsTop(), r.getBoundsRight(), r.getBoundsBottom(), Color.Red);
-    			game.draw
-    		
+
+    		if(n.getChoke()){
+    			game.drawBoxMap(n.getRegion().getBoundsLeft(), n.getRegion().getBoundsTop(), n.getRegion().getBoundsRight(), n.getRegion().getBoundsBottom(), Color.Red);
     		}
-
-    		game.drawBoxMap(r.getBoundsLeft(), r.getBoundsTop(), r.getBoundsRight(), r.getBoundsBottom(), Color.Yellow);
+    		else{
+    			game.drawBoxMap(n.getRegion().getBoundsLeft(), n.getRegion().getBoundsTop(), n.getRegion().getBoundsRight(), n.getRegion().getBoundsBottom(), Color.Yellow);
+    		}
     		
-    		game.drawTextMap(r.getCenter(), "Region ["+r.getCenter().getX()+", "+ r.getCenter().getY()+"] DefensePriority: " + r.getDefensePriority());
+    		game.drawTextMap(n.getRegion().getCenter(), "Region ["+n.getRegion().getCenter().getX()+", "+ n.getRegion().getCenter().getY()+"] DefensePriority: " + n.getRegion().getDefensePriority());
     		
 
     	}
-    	
-    	for(Chokepoint c: cp){
-    		c.
-    		game.drawTextMap(c.getCenter(), "Chokepoint: " + c.getCenter().toString());
-    		
-    	}
-    	
-    	
     }
     
 
