@@ -81,6 +81,12 @@ public class Vector {
 		return new String(x + ", "+y);
 	}
 	
+	public static Vector positionToVector(Position pos){
+		return new Vector(pos.getX(), pos.getY());
+		
+	}
+	
+	
 
 
 

@@ -4,6 +4,7 @@ import java.util.List;
 
 import bwapi.Player;
 import bwapi.Unit;
+import utilities.Vector;
 
 public class UnitManager {
 	//TODO: UnitManager Überklasse implementieren
@@ -67,6 +68,18 @@ public class UnitManager {
 	}
 	
 	public void turn(){
+		
+	}
+	
+	public void runAway(List<Unit> units){
+		Vector away = Vector.positionToVector(this.unit.getPosition());
+		
+		for(Unit u : units){
+			away.add(Vector.positionToVector(u.getPoint()));
+		}
+		
+		
+		this.unit.move(away.toPosition());
 		
 	}
 	

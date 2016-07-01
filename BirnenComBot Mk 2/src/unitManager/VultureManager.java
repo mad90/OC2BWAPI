@@ -47,7 +47,7 @@ public class VultureManager extends UnitManager{
 
 		}
 		else{
-			
+			runAway(this.unit.getUnitsInRadius(this.unit.getType().sightRange()));
 		}
 		
 	}
