@@ -1,17 +1,24 @@
 package unitManager;
 
+import java.util.List;
+
 import bwapi.Player;
 import bwapi.Position;
 import bwapi.TechType;
 import bwapi.Unit;
+import xcs.VultureXCS;
 
 public class VultureManager extends UnitManager{
 	
 	public int spidermines = 3;
+	public VultureXCS vultureXCS;
+	
 	
 	
 	public VultureManager(Unit unit, boolean startLeft, Player self){
 		super(unit, startLeft, self);
+		this.vultureXCS = new VultureXCS(5, 20);
+		
 	}
 	
 	private void useSpiderMine(){
@@ -20,9 +27,12 @@ public class VultureManager extends UnitManager{
 	
 	@Override
 	public void doStep(boolean offensive){
-		System.out.println("doStep() Vulture!");
+		checkEnemyInSight();
+//		System.out.println("doStep() Vulture!");
 		
 		if(offensive){
+//			System.out.println("Scouting!");
+			System.out.println("Scouting: "+ this.unit.getType().toString()+ " ManagerType: "+ this.getClass().getName());
 			scouting();
 		}
 		
@@ -32,11 +42,13 @@ public class VultureManager extends UnitManager{
 	public void scouting(){
 		//Test
 		
-		if(this.emptyOrFriendly(getUnit().getUnitsInRadius(getUnit().getType().sightRange()))){
+		if(!this.getEnemyInSightRange()){
 			getUnit().move(getScountingPosition());
 
 		}
-		
+		else{
+			
+		}
 		
 	}
 	
@@ -56,6 +68,8 @@ public class VultureManager extends UnitManager{
 		
 		return target;
 	}
+	
+
 	
 	
 	

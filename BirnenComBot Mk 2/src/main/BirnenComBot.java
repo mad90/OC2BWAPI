@@ -50,6 +50,8 @@ public class BirnenComBot  extends DefaultBWListener implements Runnable{
 		this.myunits = new HashSet<UnitManager>();
 		this.mybuildings = new HashSet<Unit>();
 		this.enemyunits = new HashSet<Unit>();
+		this.nodes = new HashSet<Node>();
+		this.myunits = new HashSet<UnitManager>();
 		
 		
 
@@ -87,7 +89,9 @@ public class BirnenComBot  extends DefaultBWListener implements Runnable{
         BWTA.readMap();
         BWTA.analyze();
         System.out.println("Map data ready");
-        initializeStart();
+		initializeStart();
+		
+
         System.out.println("Initialisiere Start");
         
         
@@ -97,9 +101,12 @@ public class BirnenComBot  extends DefaultBWListener implements Runnable{
     
 	@Override
 	public void onFrame() {
-		drawRegions();
-		
+
+//		drawRegions();
+//		System.out.println("Draw Region!");
 		step();
+		drawUnitsTarget();
+
 
 	}
 	
@@ -169,13 +176,18 @@ public class BirnenComBot  extends DefaultBWListener implements Runnable{
 	@Override
 	public void onUnitEvade(Unit unit) {
 	}
+	
+	public HashSet<UnitManager> getMyUnits(){
+		return this.myunits;
+	}
     
     
     public void step(){
     	//Ruft die doStep() Funktion für jeden Manager in myUnits auf
-    	
-    	for(UnitManager um: myunits){
-    		System.out.println("Step()");
+    	System.out.println("Größe my units: "+ this.myunits.size());
+    	for(UnitManager um: getMyUnits()){
+//    		System.out.println("Einheitentyp: "+ um.getUnit().getType()+ " Manager: "+ um.getClass().getName());
+//    		System.out.println("Step()");
     		um.doStep(getOffensive());
     	}
     	
@@ -199,13 +211,21 @@ public class BirnenComBot  extends DefaultBWListener implements Runnable{
     
     
     public void initializeStart(){
-    	//Initialisiert eigene UnitManager
+    	//Initialisiert eigene UnitManager sowie die Liste der Nodes
     	List<Chokepoint> cp = BWTA.getChokepoints();
+//    	System.out.println("Chokepoints: "+cp.size());
+//    	System.out.println("BWAPI Regions: "+game.getAllRegions().size());
+//    	System.out.println("Game: " + this.game.toString());
+    	List<bwapi.Region> regions = game.getAllRegions();
     	
-    	for(bwapi.Region r : game.getAllRegions()){
+    	for(bwapi.Region r : regions){
+//    		System.out.println("Versuche Node hinzuzufügen!");
+    		//TODO: Konstruktor für Node Fixen
     		this.nodes.add(new Node(r, cp, this.game));
+//    		System.out.println("Node addet!");
     		    		
     	}
+//    	System.out.println(this.nodes.size()+ " Nodes Initialisiert!");
     	
     	
     	
@@ -223,20 +243,24 @@ public class BirnenComBot  extends DefaultBWListener implements Runnable{
     	
         for (Unit u: self.getUnits()){
         	if(u.getType() != UnitType.Buildings &&!myunits.contains(u)){
-        		    if(u.getType() == UnitType.Terran_Marine){
+        		    if(u.getType().equals(UnitType.Terran_Marine)){
         				myunits.add(new MarineManager(u, getStartLeft(), this.self));
+        				System.out.println("MarineManager erstellt!" + u.getType().toString());
         			}
-        			else if(u.getType() == UnitType.Terran_Medic){
+        			else if(u.getType().equals(UnitType.Terran_Medic)){
         				myunits.add(new MedicManager(u, getStartLeft(), this.self));
+        				System.out.println("MedicManager erstellt!" + u.getType().toString());
         			}
-        			else if(u.getType() == UnitType.Terran_Siege_Tank_Tank_Mode){
+        			else if(u.getType().equals(UnitType.Terran_Siege_Tank_Tank_Mode)){
         				myunits.add(new SiegeTankManager(u, getStartLeft(), this.self));
+        				System.out.println("SiegeTankManager erstellt!" + u.getType().toString());
         			}
-        			else if(u.getType() == UnitType.Terran_Vulture){
+        			else if(u.getType().equals(UnitType.Terran_Vulture)){
         				myunits.add(new VultureManager(u, getStartLeft(), this.self));
+        				System.out.println("VultureManager erstellt!" + u.getType().toString());
         			}
         		}
-        	
+
         }
     	
     	
@@ -282,24 +306,38 @@ public class BirnenComBot  extends DefaultBWListener implements Runnable{
     	//TODO: Testen
 
     	
-//    	System.out.println("Anzahl der Gefunden Chokepoints: " + cp.size());
+    	System.out.println("Starte Zeichnen");
     	
-    	for(Node n : nodes){
+    	for(Node n : getNodes()){
 
 
     		if(n.getChoke()){
     			game.drawBoxMap(n.getRegion().getBoundsLeft(), n.getRegion().getBoundsTop(), n.getRegion().getBoundsRight(), n.getRegion().getBoundsBottom(), Color.Red);
+    			game.drawTextMap(n.getChokePosition(), "Chokepoint Region["+n.getRegion().getCenter().getX()+", "+ n.getRegion().getCenter().getY()+"] DefensePriority: " + n.getRegion().getDefensePriority());
     		}
     		else{
     			game.drawBoxMap(n.getRegion().getBoundsLeft(), n.getRegion().getBoundsTop(), n.getRegion().getBoundsRight(), n.getRegion().getBoundsBottom(), Color.Yellow);
+    			game.drawTextMap(n.getRegion().getCenter(), "Region ["+n.getRegion().getCenter().getX()+", "+ n.getRegion().getCenter().getY()+"] DefensePriority: " + n.getRegion().getDefensePriority());
     		}
     		
-    		game.drawTextMap(n.getRegion().getCenter(), "Region ["+n.getRegion().getCenter().getX()+", "+ n.getRegion().getCenter().getY()+"] DefensePriority: " + n.getRegion().getDefensePriority());
+    		
     		
 
     	}
     }
     
+    public HashSet<Node> getNodes(){
+    	return this.nodes;
+    }
+    
+    public void drawUnitsTarget(){
+    	for(UnitManager um : this.myunits){
+    		game.drawLineMap(um.getUnit().getPosition(), um.getUnit().getTargetPosition(), Color.Green);
+    	}
+    	
+    	
+    	
+    }
 
     
     

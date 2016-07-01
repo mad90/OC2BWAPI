@@ -3,6 +3,7 @@ package xcs;
 import java.io.*;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Random;
 import java.util.Scanner;
 
 
@@ -56,7 +57,7 @@ public class XCS {
 //		 ArrayList<PopulationEntry> ActionSet = new ArrayList<PopulationEntry>();
 		 
 //		 System.out.println("Population vor MatchSet: " + this.population.PopulationList.size());
-		 this.MatchSet = this.population.getMatchSet(inputdistance, inputcooldown);
+		 this.MatchSet = getMatchSet(inputdistance, inputcooldown);
 	 
 		 //Wenn MatchSet leer -> Covering
 		 //Covering direkt auf das MatchSet ausführen!
@@ -65,15 +66,15 @@ public class XCS {
 		 this.MatchSet = covering(inputdistance, inputcooldown, this.MatchSet);
 		 System.out.println(this.MatchSet.toString());
 		 //System.out.println("Pattern: "+inputdistance +", "+ inputcooldown+ "\n" + this.MatchSet.toString());
-		 float[] predictionarray = population.calculatePredictionArray(this.MatchSet);
+		 float[] predictionarray = calculatePredictionArray(this.MatchSet);
 		 for(int i=0; i< predictionarray.length; i++){
 			 System.out.println("PredictionArray: " +predictionarray[i]);
 			 
 		 }
-		 this.population.ChoseAction(predictionarray);
-		 this.ActionSet = this.population.createActionSet(this.MatchSet);
+		 chooseAction(predictionarray);
+		 this.ActionSet = createActionSet(this.MatchSet);
 		 
-		 return population.getNextChosenAction();
+		 return getNextChosenAction();
 		 
 	
 		
@@ -86,7 +87,7 @@ public class XCS {
 	public static ArrayList<PopulationEntry> generatePopulation(int size){
 		//Generiert Population Größe size und zufälligen Entries
 		
-		ArrayList<PopulationEntry> output = new ArrayList<PopulationEntry>;
+		ArrayList<PopulationEntry> output = new ArrayList<PopulationEntry>();
 		
 		for(int i = 0; i < size; i++){
 			output.add(new PopulationEntry());
@@ -319,6 +320,44 @@ public class XCS {
 	}
 
 
+	public void chooseAction(float[] predictionArray){
+		//Wählt anhand des PredictionArrays eine Aktion aus
+		 int chosenAction = Integer.MAX_VALUE;
+		 boolean areEqual = true;
+		 float tmp = 0;
+		 Random r = new Random();
+		 if((r.nextInt(100)+1)> this.perChanceOnRandomAction){
+			 for(int i = 0; i < predictionArray.length; i++){
+				 if(predictionArray[0] != predictionArray[i]){
+					 //Prüft ob alle Aktionen gleich gut sind
+					 areEqual = false;
+				 }
+								 
+				 if(predictionArray[i] > tmp){
+					 
+					 tmp = predictionArray[i];
+					 //System.out.println("Prediction Wert für "+ (i+1) +": "+predictionArray[i]+"\n");
+					 
+					 chosenAction = i+1;
+				 }
+			 }
+			 if(areEqual){
+				 //Wähle bei Gleichstand zufällige Aktion
+				Random random = new Random(); 
+				chosenAction = random.nextInt(predictionArray.length)+1;
+			 }
+		 }
+		 else{
+			 chosenAction = r.nextInt(2)+1;
+		 }
+		 
+		 if(chosenAction == Integer.MAX_VALUE){
+			 chosenAction = r.nextInt(2)+1;
+		 }
+		 //System.out.println("Gewählte Aktion: " + chosenAction + "\n");
+		 this.nextChosenAction = chosenAction;
+		
+	}
 	
 	
 

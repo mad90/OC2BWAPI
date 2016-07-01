@@ -8,9 +8,10 @@ import bwapi.Unit;
 public class UnitManager {
 	//TODO: UnitManager Überklasse implementieren
 	
-	public static Unit unit;
+	public Unit unit;
 	public boolean startLeft;
-	private Player self;
+	public Player self;
+	boolean enemyInSightRange = false;
 	
 	public UnitManager(Unit unit, boolean startLeft, Player self){
 		this.unit = unit;
@@ -20,6 +21,7 @@ public class UnitManager {
 	
 	public void doStep(boolean offensive){
 		
+//		System.out.println("Marine!"+ this.unit.getType().toString());
 	}
 	
 	public Unit getUnit(){
@@ -46,6 +48,27 @@ public class UnitManager {
     	return eof;
     	   	
     }
+    
+	public void checkEnemyInSight(){
+		List<Unit> nearbyUnits = this.unit.getUnitsInRadius(this.unit.getType().sightRange());
+		boolean enemy = false;
+		
+		for(Unit u: nearbyUnits){
+			if(u.getPlayer() != this.self){
+				enemy= true;
+				break;
+			}
+		}
+		this.enemyInSightRange = enemy;
+	}
+	
+	public boolean getEnemyInSightRange(){
+		return this.enemyInSightRange;
+	}
+	
+	public void turn(){
+		
+	}
 	
 	
 	

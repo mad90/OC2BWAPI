@@ -15,7 +15,7 @@ public class MarineManager extends UnitManager{
 	
 	@Override
 	public void doStep(boolean offensive){
-		
+//		System.out.println("Marine!"+ this.unit.getType().toString());
 	}
 
 }
