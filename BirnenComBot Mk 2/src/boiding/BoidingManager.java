@@ -1,5 +1,6 @@
 package boiding;
 
+import java.io.FileNotFoundException;
 import java.util.ArrayList;
 import java.util.HashSet;
 
@@ -29,6 +30,20 @@ public class BoidingManager {
 		this.self = self;
 		this.targetPos =  targetPos;
 		this.gaparameter = gap;
+	}
+	
+	public BoidingManager(Unit u, Player self, Position targetPos) throws FileNotFoundException{
+		this.unit = u;
+		this.self =  self;
+		this.targetPos = targetPos;
+		
+		if(Population.getNumberOfEntriesInFlatFile() > 0){
+			ArrayList<GAParameter> tmppop = Population.readFromFlatFile();
+			this.gaparameter = tmppop.get(0);
+		}
+		else{
+			this.gaparameter = new GAParameter();
+		}
 	}
 	
 	
