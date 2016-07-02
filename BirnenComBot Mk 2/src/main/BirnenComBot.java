@@ -6,6 +6,9 @@ import java.util.List;
 
 import javax.swing.colorchooser.ColorSelectionModel;
 
+import boiding.GAParameter;
+
+import java.util.Random;
 import bwapi.Color;
 import bwapi.DefaultBWListener;
 import bwapi.Game;
@@ -239,33 +242,6 @@ public class BirnenComBot  extends DefaultBWListener implements Runnable{
     	startPosIsLeft();
     	System.out.println("StartPos ist links: " + getStartLeft());
     	
-
-    	
-        for (Unit u: self.getUnits()){
-        	if(u.getType() != UnitType.Buildings &&!myunits.contains(u)){
-        		    if(u.getType().equals(UnitType.Terran_Marine)){
-        				myunits.add(new MarineManager(u, getStartLeft(), this.self));
-        				System.out.println("MarineManager erstellt!" + u.getType().toString());
-        			}
-        			else if(u.getType().equals(UnitType.Terran_Medic)){
-        				myunits.add(new MedicManager(u, getStartLeft(), this.self));
-        				System.out.println("MedicManager erstellt!" + u.getType().toString());
-        			}
-        			else if(u.getType().equals(UnitType.Terran_Siege_Tank_Tank_Mode)){
-        				myunits.add(new SiegeTankManager(u, getStartLeft(), this.self));
-        				System.out.println("SiegeTankManager erstellt!" + u.getType().toString());
-        			}
-        			else if(u.getType().equals(UnitType.Terran_Vulture)){
-        				myunits.add(new VultureManager(u, getStartLeft(), this.self));
-        				System.out.println("VultureManager erstellt!" + u.getType().toString());
-        			}
-        		}
-
-        }
-    	
-    	
-        
-        
     	if(getStartLeft()){
     		this.posenemybuild.add(new Position(3440, 2720));
     		this.posenemybuild.add(new Position(3472, 384));
@@ -276,6 +252,37 @@ public class BirnenComBot  extends DefaultBWListener implements Runnable{
     		this.posenemybuild.add(new Position(624, 2752));
     		
     	}
+    	Random random = new Random();
+    	Position target = this.posenemybuild.get(random.nextInt(2));
+    	GAParameter gaparam = new GAParameter();
+
+    	
+        for (Unit u: self.getUnits()){
+        	if(u.getType() != UnitType.Buildings &&!myunits.contains(u)){
+        		    if(u.getType().equals(UnitType.Terran_Marine)){
+        				myunits.add(new MarineManager(u, getStartLeft(), this.self, this.enemyunits, target, gaparam));
+        				System.out.println("MarineManager erstellt!" + u.getType().toString());
+        			}
+        			else if(u.getType().equals(UnitType.Terran_Medic)){
+        				myunits.add(new MedicManager(u, getStartLeft(), this.self, this.enemyunits, target));
+        				System.out.println("MedicManager erstellt!" + u.getType().toString());
+        			}
+        			else if(u.getType().equals(UnitType.Terran_Siege_Tank_Tank_Mode)){
+        				myunits.add(new SiegeTankManager(u, getStartLeft(), this.self, this.enemyunits, target));
+        				System.out.println("SiegeTankManager erstellt!" + u.getType().toString());
+        			}
+        			else if(u.getType().equals(UnitType.Terran_Vulture)){
+        				myunits.add(new VultureManager(u, getStartLeft(), this.self, this.enemyunits, target));
+        				System.out.println("VultureManager erstellt!" + u.getType().toString());
+        			}
+        		}
+
+        }
+    	
+    	
+        
+        
+
     }
     
     public void startPosIsLeft(){

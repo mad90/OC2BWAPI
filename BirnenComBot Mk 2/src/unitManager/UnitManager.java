@@ -1,8 +1,10 @@
 package unitManager;
 
+import java.util.HashSet;
 import java.util.List;
 
 import bwapi.Player;
+import bwapi.Position;
 import bwapi.Unit;
 import utilities.Vector;
 
@@ -13,11 +15,15 @@ public class UnitManager {
 	public boolean startLeft;
 	public Player self;
 	boolean enemyInSightRange = false;
+	public HashSet<Unit> enemyUnits;
+	public Position targetPos;
 	
-	public UnitManager(Unit unit, boolean startLeft, Player self){
+	public UnitManager(Unit unit, boolean startLeft, Player self, HashSet<Unit> eu, Position target){
 		this.unit = unit;
 		this.startLeft = startLeft;
 		this.self = self;
+		this.enemyUnits = eu;
+		this.targetPos = target;
 	}
 	
 	public void doStep(boolean offensive){
@@ -75,13 +81,39 @@ public class UnitManager {
 		Vector away = Vector.positionToVector(this.unit.getPosition());
 		
 		for(Unit u : units){
-			away.add(Vector.positionToVector(u.getPoint()));
+			
+			away.add(new Vector(u.getPosition(), this.unit.getPosition()));
 		}
+		System.out.println("Away Vector: " + away.toString());
 		
-		
-		this.unit.move(away.toPosition());
+		away.normalize().scalarMultiply(100);
+		System.out.println("Away Vector Normalized: " + away.toString());
+		away = away.add(Vector.positionToVector(this.unit.getPosition()));
+		this.unit.move(away.toPosition(), true);
 		
 	}
+	
+	protected Unit getClosestEnemy() {
+		Unit result = null;
+		double minDistance = Double.POSITIVE_INFINITY;
+		for (Unit enemy : this.enemyUnits) {
+			double distance = getDistance(enemy);
+			if (distance < minDistance) {
+				minDistance = distance;
+				result = enemy;
+			}
+		}
+
+		return result;
+	}
+	
+	protected double getDistance(Unit enemy) {
+		return this.unit.getPosition().getDistance(enemy.getPosition());
+	}
+	
+	
+	
+
 	
 	
 	

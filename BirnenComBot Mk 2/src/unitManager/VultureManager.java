@@ -1,5 +1,6 @@
 package unitManager;
 
+import java.util.HashSet;
 import java.util.List;
 
 import bwapi.Player;
@@ -12,12 +13,14 @@ public class VultureManager extends UnitManager{
 	
 	public int spidermines = 3;
 	public VultureXCS vultureXCS;
+	public boolean isScouting = true;
 	
 	
 	
-	public VultureManager(Unit unit, boolean startLeft, Player self){
-		super(unit, startLeft, self);
+	public VultureManager(Unit unit, boolean startLeft, Player self, HashSet<Unit> enemyUnits, Position target){
+		super(unit, startLeft, self, enemyUnits, target);
 		this.vultureXCS = new VultureXCS(5, 20);
+		
 		
 	}
 	
@@ -29,6 +32,7 @@ public class VultureManager extends UnitManager{
 	public void doStep(boolean offensive){
 		checkEnemyInSight();
 //		System.out.println("doStep() Vulture!");
+		System.out.println("Enemy in Sight:" + this.getEnemyInSightRange()); 
 		
 		if(offensive){
 //			System.out.println("Scouting!");
@@ -42,11 +46,11 @@ public class VultureManager extends UnitManager{
 	public void scouting(){
 		//Test
 		
-		if(!this.getEnemyInSightRange()){
+		if(!this.unit.isMoving() && !this.getEnemyInSightRange()){
 			getUnit().move(getScountingPosition());
 
 		}
-		else{
+		else if(this.getEnemyInSightRange() && !this.unit.isMorphing()){
 			runAway(this.unit.getUnitsInRadius(this.unit.getType().sightRange()));
 		}
 		
@@ -54,7 +58,7 @@ public class VultureManager extends UnitManager{
 	
 	public Position getScountingPosition(){
 		//TODO: Scounting Target berechnen
-		Position target = new Position(0,0);
+		Position target = this.unit.getPosition();
 		
 		if(getStartLeft()){
 			//TODO: Dynamische Position berechnen
