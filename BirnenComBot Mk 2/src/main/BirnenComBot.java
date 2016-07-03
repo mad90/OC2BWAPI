@@ -264,7 +264,7 @@ public class BirnenComBot  extends DefaultBWListener implements Runnable{
         				System.out.println("MarineManager erstellt!" + u.getType().toString());
         			}
         			else if(u.getType().equals(UnitType.Terran_Medic)){
-        				myunits.add(new MedicManager(u, getStartLeft(), this.self, this.enemyunits, target));
+        				myunits.add(new MedicManager(u, getStartLeft(), this.self, this.enemyunits, target, gaparam));
         				System.out.println("MedicManager erstellt!" + u.getType().toString());
         			}
         			else if(u.getType().equals(UnitType.Terran_Siege_Tank_Tank_Mode)){

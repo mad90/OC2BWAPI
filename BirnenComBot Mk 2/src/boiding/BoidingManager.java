@@ -48,10 +48,10 @@ public class BoidingManager {
 	
 	
 	private HashSet<Unit> getNearbyMarines(int radius){
-		//Gibt alle eignene Marine in einem Radius um die Einheit zurück
+		//Gibt alle eignene Marine/Medics in einem Radius um die Einheit zurück
 		HashSet<Unit> nearbyMarines = new HashSet<>();
 		for(Unit u : this.unit.getUnitsInRadius(radius)){
-			if(u.getType() == UnitType.Terran_Marine && u.getPlayer() ==  this.self && u != this.unit){
+			if(u.getType().isOrganic() && u.getPlayer() ==  this.self && u != this.unit){
 				nearbyMarines.add(u);
 			}
 		}
@@ -95,7 +95,7 @@ public class BoidingManager {
 	}
 	
 	//Boiding
-	public Position calculateMovePosition(Unit target){
+	public Position calculateMovePosition(Position target){
 		//Debug Ausgaben
 //		System.out.println("Suchradius: "+(this.gaparameter.getR_sig()*this.searchradius));
 //		System.out.println("Line Breite: "+ (this.gaparameter.getR_lin()*broadth));
@@ -110,7 +110,7 @@ public class BoidingManager {
 		Vector vr1;
 		if(target != null){
 //			System.out.println("Target Position: "+ target.getPosition().toString());
-			vr1 = new Vector(this.unit.getPosition(), target.getPosition());
+			vr1 = new Vector(this.unit.getPosition(), target);
 		}
 		else{
 			//Wenn keine Ziele, Laufe zur Mitte der Karte
@@ -228,6 +228,14 @@ public class BoidingManager {
 //				//Dirty Workaround TODO: besser lösen
 //				ulin = alllines.size()-1;
 //			}
+			if(ulin >= alllines.size() && alllines.size() != 0){
+				ulin = alllines.size() - 1;
+			}
+			else if(ulin >= alllines.size() && alllines.size() == 0){
+				ulin = 0;
+			}
+			
+			
 			alllines.get(ulin).add(u);
 //			System.out.println("Einheit zur Linie "+ ulin+" hinzugefügt!" );
 		}
@@ -264,7 +272,7 @@ public class BoidingManager {
 	
 	public Vector calculateBestCol(){
 		//Sollte laut Tests funktionieren
-		System.out.println("----Beginn calculateBestCol()----");
+//		System.out.println("----Beginn calculateBestCol()----");
 		//Berechnung der Zeilen (Bereiche vertikal)
 		//(0/0) Top left
 		int topborder = this.unit.getPosition().getY() - (int)(this.gaparameter.getR_sig()*this.searchradius);
@@ -286,14 +294,14 @@ public class BoidingManager {
 			
 			
 			double tmp = ((u.getPosition().getY() - topborder)/((this.gaparameter.getR_col()*broadth)+(this.gaparameter.getR_col_sep()*seperation)));
-			System.out.println("Unit in Col" + tmp + " von " + nbrcol + " Zeilen" );
+//			System.out.println("Unit in Col" + tmp + " von " + nbrcol + " Zeilen" );
 			ucol = (int) tmp;
-			System.out.println("Ucol nach int cast" + ucol);
+//			System.out.println("Ucol nach int cast" + ucol);
 //			System.out.println("Ucol ohne runden "+(u.getPosition().getY() - topborder)/((this.gaparameter.getR_col()*broadth)+(this.gaparameter.getR_col_sep()*seperation)));
 //			System.out.println("Ucol ist "+ucol);
 //			System.out.println("Länge Allcolums "+allcolumns.size());
 //			System.out.println("Anzahl der Columns "+ nbrcol);
-			System.out.println("\n"+"------------");
+//			System.out.println("\n"+"------------");
 //			if(ucol > allcolumns.size()){
 //				ucol--;
 //			}
@@ -301,6 +309,13 @@ public class BoidingManager {
 //				//Dirty Workaround TODO: besser lösen
 //				ucol = allcolumns.size()-1;
 //			}
+			if(ucol >= allcolumns.size() && allcolumns.size() != 0){
+				ucol = allcolumns.size() - 1;
+			}
+			else if(ucol >= allcolumns.size() && allcolumns.size() == 0){
+				ucol = 0;
+			}
+			
 			allcolumns.get(ucol).add(u);
 		}
 //		System.out.println("Einheiten in HashSets hinzugefügt!");//Funktioniert

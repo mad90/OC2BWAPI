@@ -2,6 +2,7 @@ package unitManager;
 
 import java.util.ArrayList;
 import java.util.HashSet;
+import java.util.List;
 
 import boiding.BoidingManager;
 import boiding.GAParameter;
@@ -35,28 +36,52 @@ public class MarineManager extends UnitManager{
 		
 			
 			try {
-				Unit target = getClosestEnemy();
-				
-				if(target != null){
-				System.out.println("Target: Typ: "+ target.getType().toString()+ " Pos: "+target.getPosition().toString());
-				}
-				
-				if (target == null) {
-					moveBoid(null);
-					return;
-				}
-				else if(this.unit.getGroundWeaponCooldown() == 0 && !this.unit.isAttackFrame() && !this.unit.isStartingAttack()
-						&& !this.unit.isAttacking() && target != null) {
-					if (WeaponType.Gauss_Rifle.maxRange() > getDistance(target) - 20.0) {
-						
-						this.unit.attack(target);
-
-						
+				PositionOrUnit target = getBestTarget();
+				if(target.isUnit()){
+					if(this.unit.getGroundWeaponCooldown() == 0 && !this.unit.isAttackFrame() && !this.unit.isStartingAttack() && !this.unit.isAttacking()){
+						if(this.unit.canUseTech(TechType.Stim_Packs)){
+						useStimpack();
+						}
+						this.unit.attack(target.getUnit());
 					}
 					else{
-						moveBoid(target);
+						moveBoid(target.getUnit().getPosition());
 					}
+					
+					
 				}
+				else if(target.isPosition()){
+					moveBoid(target.getPosition());
+				}
+				
+//				Unit target = getClosestEnemy();
+//				System.out.println("Target: Typ: "+ target.toString());
+//				if(target != null){
+//				System.out.println("Target: Typ: "+ target.getType().toString()+ " Pos: "+target.getPosition().toString());
+//				}
+//				
+//				if (target == null) {
+//					moveBoid(null);
+//					return;
+//				}
+//				else{
+//					if(!attackLowestEnemy()){
+//						moveBoid(target);
+//					}
+//				}
+//				else if(this.unit.getGroundWeaponCooldown() == 0 && !this.unit.isAttackFrame() && !this.unit.isStartingAttack()
+//						&& !this.unit.isAttacking() && target != null) {
+//					System.out.println("Marine will angreifen!");
+//					if (WeaponType.Gauss_Rifle.maxRange() > getDistance(target) - 20.0) {
+//						
+//						this.unit.attack(target);
+//
+//						
+//					}
+//					else{
+//						moveBoid(target);
+//					}
+//				}
 			} catch (Exception e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
@@ -67,8 +92,50 @@ public class MarineManager extends UnitManager{
 //			}
 	}
 	
-	public void moveBoid(Unit target){
+	public void moveBoid(Position target){
 		this.unit.move(this.boid.calculateMovePosition(target));
+	}
+	
+	public PositionOrUnit getBestTarget(){
+		//Wenn Gegner in Weaponrange gibt Gegner mit wenigster HP, sonst gibt TargetPos
+		PositionOrUnit besttarget = new PositionOrUnit(this.targetPos);
+//		List<Unit> nearunits = getUnit().getUnitsInRadius(getUnit().getType().groundWeapon().maxRange());
+		List<Unit> nearunits = getUnit().getUnitsInRadius(getUnit().getType().sightRange());
+		HashSet<Unit> enemies = new HashSet<Unit>();
+		int lowestHP = Integer.MAX_VALUE;
+//		System.out.println("Beginn erste Schleife");
+		if(!nearunits.isEmpty()){
+			for(Unit u: nearunits){
+				if(u.getPlayer() != this.self){
+					enemies.add(u);
+				}
+				
+			}
+		}
+//		System.out.println("Beginn zweite Schleife");
+		if(!enemies.isEmpty()){
+			for(Unit enemy :  enemies){
+				if(enemy.getType() == UnitType.Terran_Vulture_Spider_Mine){
+					//Wenn möglich zuerst gegnerische Spidermines angreifen, bevor diese explodieren!
+					besttarget = new PositionOrUnit(enemy);
+					break;
+				}
+				else if(enemy.getHitPoints() < lowestHP){
+					lowestHP = enemy.getHitPoints();
+					besttarget = new PositionOrUnit(enemy);
+					
+				}
+			}
+			
+		}
+		else{
+			besttarget = new PositionOrUnit(this.targetPos);
+		}
+		
+		return besttarget;
+		
+		
+		
 	}
 	
 

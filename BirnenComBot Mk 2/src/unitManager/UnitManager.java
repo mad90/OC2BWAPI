@@ -5,6 +5,7 @@ import java.util.List;
 
 import bwapi.Player;
 import bwapi.Position;
+import bwapi.PositionOrUnit;
 import bwapi.Unit;
 import utilities.Vector;
 
@@ -77,7 +78,7 @@ public class UnitManager {
 		
 	}
 	
-	public void runAway(List<Unit> units){
+	public Position runAway(HashSet<Unit> units){
 		Vector away = Vector.positionToVector(this.unit.getPosition());
 		
 		for(Unit u : units){
@@ -86,29 +87,102 @@ public class UnitManager {
 		}
 		System.out.println("Away Vector: " + away.toString());
 		
-		away.normalize().scalarMultiply(100);
+		away.normalize().scalarMultiply(50);
 		System.out.println("Away Vector Normalized: " + away.toString());
 		away = away.add(Vector.positionToVector(this.unit.getPosition()));
-		this.unit.move(away.toPosition(), true);
-		
+//		this.unit.move(away.toPosition(), true);
+		return away.toPosition();
 	}
 	
-	protected Unit getClosestEnemy() {
-		Unit result = null;
+//	protected Unit getClosestEnemy() {
+//		Unit result = null;
+//		double minDistance = Double.POSITIVE_INFINITY;
+//		for (Unit enemy : this.enemyUnits) {
+//			double distance = getDistance(enemy);
+//			if (distance < minDistance) {
+//				minDistance = distance;
+//				result = enemy;
+//			}
+//		}
+//
+//		return result;
+//	}
+	
+	public PositionOrUnit getClosestEnemy(){
+		PositionOrUnit result = null;
+		
 		double minDistance = Double.POSITIVE_INFINITY;
-		for (Unit enemy : this.enemyUnits) {
+		for (Unit enemy : this.unit.getUnitsInWeaponRange(this.unit.getType().groundWeapon())) {
 			double distance = getDistance(enemy);
 			if (distance < minDistance) {
 				minDistance = distance;
-				result = enemy;
+				result = new PositionOrUnit(enemy);
 			}
 		}
-
+		if(result == null){
+			result = new PositionOrUnit(this.targetPos);
+		}
 		return result;
+		
 	}
+	
+
+	
+	
 	
 	protected double getDistance(Unit enemy) {
 		return this.unit.getPosition().getDistance(enemy.getPosition());
+	}
+	
+	
+	public boolean attackLowestEnemy(){
+		List<Unit> enemiesinrange = this.unit.getUnitsInRadius(getUnit().getType().sightRange());
+		int lowestHP = Integer.MAX_VALUE;
+		Unit target = null;
+		boolean attacks = false;
+		
+		for(Unit u :enemiesinrange){
+			if(u.getHitPoints() < lowestHP){
+				lowestHP = u.getHitPoints();
+				target = u;
+			}
+		}
+		
+		if(target!= null){
+			if(this.unit.getGroundWeaponCooldown() == 0 && !this.unit.isAttackFrame() && !this.unit.isStartingAttack()){
+				if(getDistance(target) < this.unit.getType().groundWeapon().maxRange()){
+					this.unit.attack(target);
+					attacks  = true;
+				}
+			}
+			
+		}
+		return attacks;
+		
+		
+	}
+	
+	public int calculateEnemyUnitHpInSight(){
+		int totalHP = 0;
+		for(Unit u: this.unit.getUnitsInRadius(this.unit.getType().sightRange())){
+			if(u.getPlayer() != self && !u.getType().isBuilding()){
+				totalHP += u.getHitPoints();
+			}
+			
+		}
+		
+		return totalHP;
+		
+	}
+	
+	public Position runAwayFromTarget(Unit target){
+		Vector away =  new Vector(target.getPosition(), this.unit.getPosition());
+		away.normalize();
+		away.scalarMultiply(32);
+		
+		return new Position(this.unit.getX()+(int) away.getX(), this.unit.getY()+(int) away.getY());
+		
+		
 	}
 	
 	
