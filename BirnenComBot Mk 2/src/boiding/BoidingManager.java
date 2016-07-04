@@ -19,7 +19,7 @@ public class BoidingManager {
 	
 //	HashSet<Unit> enemyUnits;
 	GAParameter gaparameter;
-	static int lengthmuliplier = 15;
+	static int lengthmuliplier = 25;
 	public Player self;
 	Position targetPos;
 	
@@ -231,7 +231,7 @@ public class BoidingManager {
 			if(ulin >= alllines.size() && alllines.size() != 0){
 				ulin = alllines.size() - 1;
 			}
-			else if(ulin >= alllines.size() && alllines.size() == 0){
+			else if(ulin >= alllines.size() && alllines.size() == 0 || ulin < 0){
 				ulin = 0;
 			}
 			
@@ -312,7 +312,7 @@ public class BoidingManager {
 			if(ucol >= allcolumns.size() && allcolumns.size() != 0){
 				ucol = allcolumns.size() - 1;
 			}
-			else if(ucol >= allcolumns.size() && allcolumns.size() == 0){
+			else if(ucol >= allcolumns.size() && allcolumns.size() == 0 || ucol < 0){
 				ucol = 0;
 			}
 			

@@ -11,6 +11,8 @@ import utilities.Vector;
 
 public class UnitManager {
 	//TODO: UnitManager Überklasse implementieren
+	//	Punkt rechts oben 2512/976 unten: 2608,2032
+	//	Links: unten 1296,2192 oben: 1456,848
 	
 	public Unit unit;
 	public boolean startLeft;
@@ -18,6 +20,10 @@ public class UnitManager {
 	boolean enemyInSightRange = false;
 	public HashSet<Unit> enemyUnits;
 	public Position targetPos;
+	public Position[] waypoints=  new Position[2];
+	public boolean targetchanged = false;
+	public boolean reachedlastwp = false;
+	public int wpindex = 0;
 	
 	public UnitManager(Unit unit, boolean startLeft, Player self, HashSet<Unit> eu, Position target){
 		this.unit = unit;
@@ -25,6 +31,25 @@ public class UnitManager {
 		this.self = self;
 		this.enemyUnits = eu;
 		this.targetPos = target;
+		
+		if(startLeft){
+			if(this.targetPos.equals(new Position(3440, 2720))){ //Unten -> 1. Unterer 2. Oberer Rechts
+				this.waypoints = new Position[]{new Position(2608,2032), new Position(2512,976)};
+			}
+			else if(this.targetPos.equals(new Position(3472, 384))){ //Oben -> 1. Oberer Wegpunkt 2. Unterer Rechts
+				this.waypoints = new Position[]{new Position(2512,976), new Position(2608,2032)};
+			}
+		}
+		else{
+			if(this.targetPos.equals(new Position(624, 2752))){ //Unten -> 1. Unterer 2. Oberer Links
+				this.waypoints = new Position[]{new Position(1400,2192), new Position(1456,848)};
+			}
+			else if(this.targetPos.equals(new Position(3472, 384))){ //Oben -> 1. Oberer Wegpunkt 2. Unterer Links
+				this.waypoints = new Position[]{new Position(1456,848), new Position(1296,2192)};
+			}
+			
+		}
+		
 	}
 	
 	public void doStep(boolean offensive){
@@ -175,16 +200,20 @@ public class UnitManager {
 		
 	}
 	
-	public Position runAwayFromTarget(Unit target){
+	public Position runAwayFromTarget(Unit target, int distance){
 		Vector away =  new Vector(target.getPosition(), this.unit.getPosition());
 		away.normalize();
-		away.scalarMultiply(32);
+		away.scalarMultiply(distance);
 		
 		return new Position(this.unit.getX()+(int) away.getX(), this.unit.getY()+(int) away.getY());
 		
 		
 	}
-	
+
+	public void setTargetPos(Position newTarget){
+		this.targetchanged = true;
+		this.targetPos = newTarget;
+	}
 	
 	
 

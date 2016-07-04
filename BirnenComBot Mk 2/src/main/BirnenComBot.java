@@ -1,5 +1,6 @@
 package main;
 
+import java.io.FileNotFoundException;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
@@ -7,6 +8,7 @@ import java.util.List;
 import javax.swing.colorchooser.ColorSelectionModel;
 
 import boiding.GAParameter;
+import boiding.Population;
 
 import java.util.Random;
 import bwapi.Color;
@@ -40,6 +42,9 @@ public class BirnenComBot  extends DefaultBWListener implements Runnable{
 	public HashSet<Node> nodes;
 	
     private ArrayList<Position> posenemybuild;
+    
+    public int targetIndex;
+    public Position targetBuilding;
     
     
     boolean startleft;
@@ -96,6 +101,13 @@ public class BirnenComBot  extends DefaultBWListener implements Runnable{
 		
 
         System.out.println("Initialisiere Start");
+        String opponent = "";
+        for(Player p: game.getPlayers()){
+        	if(!p.equals(this.self)){
+        		opponent += p.getName();
+        	}
+        }
+        System.out.println(self.getName() + " VS. " + opponent +"!");
         
         
         
@@ -105,7 +117,7 @@ public class BirnenComBot  extends DefaultBWListener implements Runnable{
 	@Override
 	public void onFrame() {
 
-//		drawRegions();
+		drawRegions();
 //		System.out.println("Draw Region!");
 		step();
 		drawUnitsTarget();
@@ -117,6 +129,10 @@ public class BirnenComBot  extends DefaultBWListener implements Runnable{
 	public void onUnitDestroy(Unit unit) {
 		if (unit == null) {
 			return;
+		}
+		if(unit.getType().isBuilding() && unit.getPlayer() != this.self){
+			chooseNextTargetBuilding();
+			updateTargetBuilding(this.targetBuilding);
 		}
 
 		UnitManager rm = null;
@@ -238,9 +254,11 @@ public class BirnenComBot  extends DefaultBWListener implements Runnable{
     		}
     		
     	}
-    	System.out.println("Size mybuildings"+ mybuildings.size());
+//    	System.out.println("Size mybuildings"+ mybuildings.size());
     	startPosIsLeft();
-    	System.out.println("StartPos ist links: " + getStartLeft());
+//    	System.out.println("StartPos ist links: " + getStartLeft());
+//    	Punkt rechts oben 2512/976 unten: 2608,2032
+//    	Links: unten 1296,2192 oben: 1456,848
     	
     	if(getStartLeft()){
     		this.posenemybuild.add(new Position(3440, 2720));
@@ -252,27 +270,39 @@ public class BirnenComBot  extends DefaultBWListener implements Runnable{
     		this.posenemybuild.add(new Position(624, 2752));
     		
     	}
-    	Random random = new Random();
-    	Position target = this.posenemybuild.get(random.nextInt(2));
-    	GAParameter gaparam = new GAParameter();
+    	chooseNextTargetBuilding();
+    	GAParameter gaparam;
+    	if(Population.getNumberOfEntriesInFlatFile() > 0){
+    		try {
+				Population population = new Population(Population.readFromFlatFile());
+				gaparam = population.chooseGAParameter();
+			} catch (FileNotFoundException e) {
+				gaparam = new GAParameter();
+				
+			}
+     	}
+    	else{
+    		gaparam = new GAParameter();
+    	}
+		
 
     	
         for (Unit u: self.getUnits()){
         	if(u.getType() != UnitType.Buildings &&!myunits.contains(u)){
         		    if(u.getType().equals(UnitType.Terran_Marine)){
-        				myunits.add(new MarineManager(u, getStartLeft(), this.self, this.enemyunits, target, gaparam));
+        				myunits.add(new MarineManager(u, getStartLeft(), this.self, this.enemyunits, this.targetBuilding, gaparam));
         				System.out.println("MarineManager erstellt!" + u.getType().toString());
         			}
         			else if(u.getType().equals(UnitType.Terran_Medic)){
-        				myunits.add(new MedicManager(u, getStartLeft(), this.self, this.enemyunits, target, gaparam));
+        				myunits.add(new MedicManager(u, getStartLeft(), this.self, this.enemyunits, this.targetBuilding, gaparam));
         				System.out.println("MedicManager erstellt!" + u.getType().toString());
         			}
         			else if(u.getType().equals(UnitType.Terran_Siege_Tank_Tank_Mode)){
-        				myunits.add(new SiegeTankManager(u, getStartLeft(), this.self, this.enemyunits, target));
+        				myunits.add(new SiegeTankManager(u, getStartLeft(), this.self, this.enemyunits, this.targetBuilding, gaparam));
         				System.out.println("SiegeTankManager erstellt!" + u.getType().toString());
         			}
         			else if(u.getType().equals(UnitType.Terran_Vulture)){
-        				myunits.add(new VultureManager(u, getStartLeft(), this.self, this.enemyunits, target));
+        				myunits.add(new VultureManager(u, getStartLeft(), this.self, this.enemyunits, this.targetBuilding));
         				System.out.println("VultureManager erstellt!" + u.getType().toString());
         			}
         		}
@@ -318,14 +348,14 @@ public class BirnenComBot  extends DefaultBWListener implements Runnable{
     	for(Node n : getNodes()){
 
 
-    		if(n.getChoke()){
-    			game.drawBoxMap(n.getRegion().getBoundsLeft(), n.getRegion().getBoundsTop(), n.getRegion().getBoundsRight(), n.getRegion().getBoundsBottom(), Color.Red);
-    			game.drawTextMap(n.getChokePosition(), "Chokepoint Region["+n.getRegion().getCenter().getX()+", "+ n.getRegion().getCenter().getY()+"] DefensePriority: " + n.getRegion().getDefensePriority());
-    		}
-    		else{
+//    		if(n.getChoke()){
+//    			game.drawBoxMap(n.getRegion().getBoundsLeft(), n.getRegion().getBoundsTop(), n.getRegion().getBoundsRight(), n.getRegion().getBoundsBottom(), Color.Red);
+//    			game.drawTextMap(n.getChokePosition(), "Chokepoint Region["+n.getRegion().getCenter().getX()+", "+ n.getRegion().getCenter().getY()+"] DefensePriority: " + n.getRegion().getDefensePriority());
+//    		}
+//    		else{
     			game.drawBoxMap(n.getRegion().getBoundsLeft(), n.getRegion().getBoundsTop(), n.getRegion().getBoundsRight(), n.getRegion().getBoundsBottom(), Color.Yellow);
     			game.drawTextMap(n.getRegion().getCenter(), "Region ["+n.getRegion().getCenter().getX()+", "+ n.getRegion().getCenter().getY()+"] DefensePriority: " + n.getRegion().getDefensePriority());
-    		}
+//    		}
     		
     		
     		
@@ -345,8 +375,31 @@ public class BirnenComBot  extends DefaultBWListener implements Runnable{
     	
     	
     }
-
     
+    public void chooseTargetBuilding(){
+    	Random random = new Random();
+    	this.targetIndex = random.nextInt(this.posenemybuild.size());
+    	this.targetBuilding = this.posenemybuild.get(this.targetIndex);
+    	
+    }
+
+    public void chooseNextTargetBuilding(){
+    	Random random = new Random();
+    	int newtarget = random.nextInt(this.posenemybuild.size());
+    	while(newtarget == this.targetIndex){
+    		newtarget = random.nextInt(this.posenemybuild.size());
+    	}
+    	this.targetIndex = newtarget;
+    	this.targetBuilding = this.posenemybuild.get(this.targetIndex);
+    	
+    }
+    
+    public void updateTargetBuilding(Position newtarget){
+    	for(UnitManager um : this.myunits){
+    		um.setTargetPos(newtarget);
+    	}
+    	
+    }
     
 	
 

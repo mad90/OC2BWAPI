@@ -39,19 +39,41 @@ public class MarineManager extends UnitManager{
 				PositionOrUnit target = getBestTarget();
 				if(target.isUnit()){
 					if(this.unit.getGroundWeaponCooldown() == 0 && !this.unit.isAttackFrame() && !this.unit.isStartingAttack() && !this.unit.isAttacking()){
-						if(this.unit.canUseTech(TechType.Stim_Packs)){
-						useStimpack();
+						if(this.unit.canUseTech(TechType.Stim_Packs) && !this.unit.isStimmed() && this.unit.getHitPoints() > 20){
+							useStimpack();
 						}
+//						if(WeaponType.Gauss_Rifle.maxRange() > getDistance(target.getUnit())+20){
 						this.unit.attack(target.getUnit());
+//						}
+//						else if(this.unit.getGroundWeaponCooldown() != 0 || !this.unit.isAttackFrame() || !this.unit.isStartingAttack()){
+//							moveBoid(target.getUnit().getPosition());
+//						}
 					}
-					else{
-						moveBoid(target.getUnit().getPosition());
-					}
+
+//					else if(this.unit.i){
+//						moveBoid(target.getUnit().getPosition());
+//					}
 					
 					
 				}
 				else if(target.isPosition()){
-					moveBoid(target.getPosition());
+					if(!this.targetchanged || this.reachedlastwp){
+						moveBoid(target.getPosition());
+					}
+					else if(this.targetchanged && !this.reachedlastwp){
+						if(this.unit.getDistance(this.waypoints[this.wpindex]) < 50){
+							this.wpindex++;
+							if(this.wpindex > this.waypoints.length -1){
+								this.reachedlastwp = true;
+							}
+						}
+						if(!this.reachedlastwp){
+							moveBoid(this.waypoints[this.wpindex]);
+						}
+						else{
+							moveBoid(target.getPosition());
+						}
+					}
 				}
 				
 //				Unit target = getClosestEnemy();
@@ -119,6 +141,11 @@ public class MarineManager extends UnitManager{
 					//Wenn möglich zuerst gegnerische Spidermines angreifen, bevor diese explodieren!
 					besttarget = new PositionOrUnit(enemy);
 					break;
+				}
+				if(this.targetchanged && enemy.getType() == UnitType.Terran_Supply_Depot){
+					//Wenn bereit ein Gebäude zerstört das verbleibende Gebäude fokussieren
+					besttarget = new PositionOrUnit(enemy);
+					return besttarget;
 				}
 				else if(enemy.getHitPoints() < lowestHP){
 					lowestHP = enemy.getHitPoints();

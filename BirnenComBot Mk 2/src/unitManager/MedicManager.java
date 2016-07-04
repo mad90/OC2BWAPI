@@ -35,8 +35,24 @@ public class MedicManager extends UnitManager{
 				}
 			}
 			else if(target.isPosition()){
-				moveBoid(target.getPosition());
-			}
+				if(!this.targetchanged || this.reachedlastwp){
+					moveBoid(target.getPosition());
+				}
+				else if(this.targetchanged && !this.reachedlastwp){
+					if(this.unit.getDistance(this.waypoints[this.wpindex]) < 50){
+						this.wpindex++;
+						if(this.wpindex > this.waypoints.length -1){
+							this.reachedlastwp = true;
+						}
+					}
+					if(!this.reachedlastwp){
+						moveBoid(this.waypoints[this.wpindex]);
+					}
+					else{
+						moveBoid(target.getPosition());
+					}
+				}
+				}
 		} catch (Exception e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();

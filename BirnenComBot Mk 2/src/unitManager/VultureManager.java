@@ -17,6 +17,8 @@ public class VultureManager extends UnitManager{
 	public VultureXCS vultureXCS;
 	public boolean isScouting = true;
 	public boolean usedSpiderMineTrick = false;
+	public boolean reachedwaypoint = false;
+	private Position waypoint = new Position(2048, 1536);
 	
 	
 	
@@ -36,6 +38,10 @@ public class VultureManager extends UnitManager{
 		if(offensive){
 			try {
 				PositionOrUnit target = getBestScoutingPosition();
+				if(checkLayMine()){
+					layMine();
+				}
+				else{
 				if(target.isUnit()){
 					
 //					if(this.unit.getGroundWeaponCooldown() == 0 && !this.unit.isAttackFrame() && !this.unit.isStartingAttack() && !this.unit.isAttacking()){
@@ -48,7 +54,35 @@ public class VultureManager extends UnitManager{
 					
 				}
 				else if(target.isPosition()){
-					this.unit.move(target.getPosition());
+					if(!reachedwaypoint && this.unit.getPosition().getApproxDistance(waypoint) < 100){
+						this.reachedwaypoint = true;
+					}
+					
+					if(!reachedwaypoint){
+						this.unit.move(waypoint);
+					}
+					else{
+						if(!this.targetchanged || this.reachedlastwp){
+							this.unit.move(target.getPosition());
+						}
+						else if(this.targetchanged && !this.reachedlastwp){
+							if(this.unit.getDistance(this.waypoints[this.wpindex]) < 50){
+								this.wpindex++;
+								if(this.wpindex > this.waypoints.length -1){
+									this.reachedlastwp = true;
+								}
+							}
+							if(!this.reachedlastwp){
+								this.unit.move(this.waypoints[this.wpindex]);
+							}
+							else{
+								this.unit.move(target.getPosition());
+							}
+						
+						}
+					}
+					
+				}
 				}
 			
 			
@@ -186,16 +220,100 @@ public class VultureManager extends UnitManager{
 				enemies.add(u);
 			}
 		}
-		System.out.println("Enemies in Kite ist emptry " +enemies.isEmpty());
+//		System.out.println("Enemies in Kite ist emptry " +enemies.isEmpty());
 		if(this.unit.getGroundWeaponCooldown() == 0 && !this.unit.isAttackFrame() && !this.unit.isStartingAttack() && !this.unit.isAttacking()){
 			this.unit.attack(target);
 		}
-		else if(!enemies.isEmpty()){
-				System.out.println("RunAway!");
-				this.unit.move(runAwayFromTarget(target));
+		else if(!enemies.isEmpty() && this.unit.isInWeaponRange(target)){
+//				System.out.println("RunAway!");
+				this.unit.move(runAwayFromTarget(target, 16));
+		}
+		}
+	
+
+	public boolean checkLayMine(){
+		HashSet<Unit> enemies = new HashSet<Unit>();
+		List<Unit> nearunits = getUnit().getUnitsInRadius(getUnit().getType().sightRange());
+		if(!nearunits.isEmpty()){
+			for(Unit u: nearunits){
+				if(u.getPlayer() != this.self){
+					enemies.add(u);
+				}
+				
 			}
 		}
+		else if(nearunits.isEmpty()){
+			return false;
+		}
+		
+		if(nearbyTank() && this.spidermines > 0){
+			return true;
+		
+		}
+		if(enemies.size() > 3){
+			return true;
+		}
+		return false;
 	}
+	
+	public void layMine(){
+		HashSet<Unit> enemies = new HashSet<Unit>();
+		List<Unit> nearunits = getUnit().getUnitsInRadius(getUnit().getType().sightRange());
+		Position target;
+		if(nearbyTank()){
+			if(!nearunits.isEmpty()){
+				for(Unit u: nearunits){
+					if(u.getPlayer() != this.self && !u.getType().isBuilding()){
+						if(u.getType() ==  UnitType.Terran_Siege_Tank_Siege_Mode || u.getType() ==  UnitType.Terran_Siege_Tank_Tank_Mode){
+							target = u.getPosition();
+							this.unit.useTech(TechType.Spider_Mines, target);
+							try {
+								wait(150);
+							} catch (InterruptedException e) {
+								// TODO Auto-generated catch block
+								e.printStackTrace();
+							}
+							this.spidermines--;
+							break;
+						}
+					}
+					
+				}
+			}
+		}
+		else{
+			if(!nearunits.isEmpty()){
+				for(Unit u: nearunits){
+					if(u.getPlayer() != this.self && !u.getType().isBuilding()){
+						if(u.getType().isOrganic()){
+							target = u.getPosition();
+							this.unit.useTech(TechType.Spider_Mines, target);
+							try {
+								wait(150);
+							} catch (InterruptedException e) {
+								// TODO Auto-generated catch block
+								e.printStackTrace();
+							}
+							this.spidermines--;
+							break;
+						}
+					}
+					
+				}
+			}
+			
+			
+		}
+	}
+	
+	
+	
+	
+	
+	
+	
+}
+	
 	
 
 	

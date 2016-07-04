@@ -145,7 +145,7 @@ public class Population implements Serializable {
 		ArrayList<GAParameter> populationList = new ArrayList<GAParameter>();
 		
 		boolean notEnd = true;
-		Scanner file = new Scanner(new File("Population.txt"));
+		Scanner file = new Scanner(new File("read/Population.txt"));
 //		file.nextLine();
 //		System.out.println("hasNextLine(): " + file.hasNextLine());
 
@@ -190,7 +190,7 @@ public class Population implements Serializable {
 	public static void appendToFlatFile(GAParameter... gap){
 		try
 		{
-		    String filename= "Population.txt";
+		    String filename= "write/Population.txt";
 		    FileWriter fw = new FileWriter(filename,true); //the true will append the new data
 		    for(GAParameter g: gap){
 		    	fw.write(g.toString());//appends the string to the file
