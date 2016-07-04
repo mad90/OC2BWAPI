@@ -14,14 +14,194 @@ import java.util.HashMap;
 
 
 public class PathFinder {
-	private static Game game;
-	private Player self;
+	public static Game game;
+	public Player self;
+	UnitSet unitSet;
+	RegionSet regionSet;
 	ArrayList<Region> totalVisitedRegion=new ArrayList<Region>();
-//	HashMap<> // TODO Jeden besuchende Knoten müssen in HashMap speichern, die Region und Gewicht bzw Cost oder Länge des Pfads beinhaltet.
 //	HashMap<Region,Cost> allVistited=new HashMap<Region,Cost>();
 	ArrayList<Region> path=new ArrayList<Region>();
-	int increament=0;//bestimmen,dass path ändern oder nicht
-	public void run(){// TODO
+	int increment=0;//bestimmen,dass path ändern oder nicht
+	ArrayList<UnitSet> initUnitSet=new ArrayList<UnitSet>();
+	ArrayList<RegionSet> initRegionSet=new ArrayList<RegionSet>();
+	ArrayList<RegionSet> visitedRegion=new ArrayList<RegionSet>();
+	
+	public void init(){		
+		initUnitSet=unitSet.initUnit();
+		initRegionSet=regionSet.initRegion();
+	}
+	public Region findUnitRegion(int id){		
+		Region region=null;
+		if(unitSet.id==id){			
+			region=unitSet.getUnit().getRegion();
+		}
+		return region;
+	}
+
+	public ArrayList<Region> findNeighbour(bwapi.Region r){
+		ArrayList<Region> neighbour=new ArrayList<Region>();
+		List<bwapi.Region> neighbourRegion=r.getNeighbors();
+		for(Region region:neighbourRegion){
+			neighbour.add(region);
+		}
+//		neighbour=(ArrayList<Region>) neighbourRegion;		
+		return neighbour;
+	}
+//	public void firstCalculate(Region r){
+//		ArrayList<Region> neighbour=new ArrayList<Region>();
+//		neighbour=findNeighbour(r);
+//		init();
+//		for(Region region:neighbour){
+//			
+//		}
+//		
+//	}
+	public void calculateDistance(Region r){
+		ArrayList<Region> neighbour=new ArrayList<Region>();
+//		ArrayList<Region> tempPath=new ArrayList<Region>();
+		
+//		init(); // TODO Wo kann man init() legen.
+//		for(RegionSet regionSet:initRegionSet){
+//			if(r==regionSet.getRegion()){
+//				regionSet.path.add(r);								
+//			}
+//		}k
+		neighbour=findNeighbour(r);
+		
+		for(Region region:neighbour){			
+			for(RegionSet regionSet:initRegionSet){				
+				if((region==regionSet.getRegion())){
+					regionSet.path.add(r);
+					if(regionSet.distance==Integer.MAX_VALUE){
+						int tempDistance;
+						regionSet.setDistance(0);
+						for(RegionSet tempR:initRegionSet){
+							if(r==tempR.region){
+								regionSet.setDistance(tempR.getDistance());
+								break;
+							}
+						}
+						tempDistance=r.getDistance(region)+regionSet.getDistance();
+						regionSet.path.add(region);
+						regionSet.setTotalDistance(tempDistance);
+						visitedRegion.add(regionSet);// TODO ist diese Code hier geeignet?
+					}else{						
+//						if(regionSet.totalDistance!=0){						
+							int tempDistance=0;
+							regionSet.setDistance(0);
+							for(RegionSet tempR:initRegionSet){
+								if(r==tempR.region){
+									for(int i=1;i<tempR.path.size()-1;i++){							
+										tempR.distance+=tempR.path.get(i-1).getDistance(tempR.path.get(i));
+									}
+									tempDistance=tempR.distance+r.getDistance(region);
+								}
+							}
+							if(regionSet.totalDistance>tempDistance){
+								regionSet.setDistance(tempDistance);// TODO
+								regionSet.setTotalDistance(tempDistance);
+								regionSet.path.clear();
+								for(RegionSet tempR:initRegionSet){
+									if(r==tempR.region){
+										regionSet.path=tempR.path;
+										break;
+									}										
+								}
+								regionSet.path.add(region);
+							}
+							visitedRegion.add(regionSet);// TODO ist diese Code hier geeignet?
+					}					
+				}
+			}
+		}		
+	}
+	public Region findNext(ArrayList<RegionSet> regionSet){
+		Region next=null;
+		int temp=regionSet.get(0).totalDistance;
+		for(RegionSet regionset:visitedRegion){
+			if(temp>regionset.getTotalDistance()){
+				temp=regionset.totalDistance;
+				next=regionset.region;
+			}			
+		}
+		return next;
+	}
+	
+	public void dijkstraAlgorithmus(Region target){
+		init();
+		for(UnitSet unitSet:initUnitSet){			
+			Region startRegion=findUnitRegion(unitSet.getId());
+			ArrayList<Region> neighbour=findNeighbour(startRegion);
+			ArrayList<Region> path=new ArrayList<Region>();
+//			for(Region region:neighbour){
+//				if(region!=target){
+				boolean b=true;
+				calculateDistance(startRegion);
+				do{		
+					Region next=findNext(visitedRegion);
+					calculateDistance(next);
+					for(RegionSet regionSet:visitedRegion){
+						if(regionSet.getRegion()==target){
+							path=regionSet.path;
+							b=false;
+						}
+					}
+				}while(b);
+//			}
+		}
+	}
+	public ArrayList<Region> dijkstraAlgorithmus(int regionID){
+		Region target=null;
+		init();
+		for(RegionSet regionSet:initRegionSet){
+			if(regionSet.id==regionID){
+				target=regionSet.region;
+			}
+		}
+		for(UnitSet unitSet:initUnitSet){			
+			Region startRegion=findUnitRegion(unitSet.getId());
+			ArrayList<Region> neighbour=findNeighbour(startRegion);
+//			ArrayList<Region> path=new ArrayList<Region>();
+//			for(Region region:neighbour){
+//				if(region!=target){
+				boolean b=true;
+				calculateDistance(startRegion);
+				do{		
+					Region next=findNext(visitedRegion);
+					calculateDistance(next);
+					for(RegionSet regionSet:visitedRegion){
+						if(regionSet.getRegion()==target){
+							path=regionSet.path;
+							b=false;
+						}
+					}
+				}while(b);
+//			}
+		}
+		return path;
+	}
+
+//	public boolean checkTargetInNeighbour(Region r){
+//		boolean targetInNeighbour=false;
+//		
+//		return targetInNeighbour;
+//		
+//	}
+
+//	public ArrayList<Region> path(Region r){
+//		
+//	}
+	
+	
+	
+	
+	
+	
+	
+		
+	
+	
+	public void run(){
 		for (Unit myUnit : self.getUnits()){
 			myUnit.getPosition();
 		}
@@ -29,51 +209,115 @@ public class PathFinder {
 		
 //		dijkstraAlgorithmus();
 	}
-	public void dijkstraAlgorithmus(Position startP,Position zielP){	// TODO	
+//	public void dijkstra(bwapi.Region target){		
+////		ArrayList<Region> unitCurrentRegion=findCurrent();
+//		
+////		unitCurrentRegion=findCurrent();
+//		ArrayList<bwapi.Region> unitCurrentRegion=findNeighbour(findcurrentRegion());		
+//		for(bwapi.Region r:unitCurrentRegion){
+//			if(r.getCenter()==target.getCenter()){
+//				attack(target.getCenter());
+//				System.out.println("b!");
+//			}else{
+//				path.add(findShortestPath(r));
+////				increment++;
+//				System.out.println("c!");
+//			}
+//			while(path.get(path.size()-1).getCenter()!=target.getCenter()){
+//				path.add(findShortestPath(path.get(path.size()-1)));
+////				increment++;
+//			}
+//			for (Unit myUnit : self.getUnits()){
+//				if(myUnit.getType()==UnitType.Terran_Medic){
+//					for(int i=0;i<path.size();i++){
+//						move(path.get(i).getCenter());
+//					}
+//				}
+//				if(myUnit.getRegion()==r){
+//					for(int i=0;i<path.size();i++){
+//						move(path.get(i).getCenter());
+//					}
+//				}
+//			}
+//			
+//		}
+//		
+//		
+//		
+//		
+//	}
+	
+	public void dijkstraAlgorithm(Region target){
+		ArrayList<Region> unitCurrentRegion=findCurrent();
+		System.out.println("a!");
+//		unitCurrentRegion=findCurrent();
+		
+		for(Region r:unitCurrentRegion){
+			if(r.getCenter()==target.getCenter()){
+				attack(target.getCenter());
+				System.out.println("b!");
+			}else{
+				path.add(findShortestPath(r));
+//				increment++;
+				System.out.println("c!");
+			}
+			while(path.get(path.size()-1).getCenter()!=target.getCenter()){
+				path.add(findShortestPath(path.get(path.size()-1)));
+//				increment++;
+			}
+			for (Unit myUnit : self.getUnits()){
+				if(myUnit.getType()==UnitType.Terran_Medic){
+					for(int i=0;i<path.size();i++){
+						move(path.get(i).getCenter());
+					}
+				}
+				if(myUnit.getRegion()==r){
+					for(int i=0;i<path.size();i++){
+						move(path.get(i).getCenter());
+					}
+				}
+			}
+			
+		}
 		
 		
+//		ArrayList<Position> unitCurrentPosition=new ArrayList<Position>();
+//		ArrayList<Region> unitCurrentRegion=new ArrayList<Region>();
+//		unitCurrentRegion=findCurrent();
+//		unitCurrentPosition=findCurrentPosition();
+//		for(Position p:unitCurrentPosition){
+//			if(p.getX()>(target.getBoundsLeft()+50)&&p.getX()<(target.getBoundsRight()+50)&&p.getY()>(target.getBoundsTop()+50)&&p.getY()<(target.getBoundsBottom()+50)){
+//				attack(target.getCenter());
+//			}else{
+//				for(Region r:unitCurrentRegion){
+////					findNeighbour(r);
+//					Region moveTo=findShortestPath(r,target);
+//					move(moveTo.getCenter());
+//				}
+//			}
+//		}
+//		
+//		for(Region r:unitCurrentRegion){
+////			findNeighbour(r);
+//			Region moveTo=findShortestPath(r,target);
+//			
+//		}
 		
 		
 		
 	}
 	
-	public void dijkstraAlgorithmus(Region target){
-		
-		ArrayList<Position> unitCurrentPosition=new ArrayList<Position>();
-		ArrayList<Region> unitCurrentRegion=new ArrayList<Region>();
-		unitCurrentRegion=findCurrent();
-		unitCurrentPosition=findCurrentPosition();
-		for(Position p:unitCurrentPosition){
-			if(p.getX()>(target.getBoundsLeft()+50)&&p.getX()<(target.getBoundsRight()+50)&&p.getY()>(target.getBoundsTop()+50)&&p.getY()<(target.getBoundsBottom()+50)){
-				attack(target.getCenter());
-			}else{
-				for(Region r:unitCurrentRegion){
-//					findNeighbour(r);
-					Region moveTo=findShortestPath(r,target);
-					move(moveTo.getCenter());
-				}
-			}
-		}
-		
-		for(Region r:unitCurrentRegion){
-//			findNeighbour(r);
-			Region moveTo=findShortestPath(r,target);
-			
-		}
-		
-		
-		
-	}
+
 
 
 	private void move(Position center) {
-		// TODO Auto-generated method stub
+		
 		for (Unit myUnit : self.getUnits()){
 			myUnit.attack(center);
 		}
 	}
 	private void attack(Position center) {
-		// TODO Auto-generated method stub
+		
 		for (Unit myUnit : self.getUnits()){
 			myUnit.attack(center);
 		}
@@ -114,7 +358,6 @@ public class PathFinder {
 		}
 		return unitCurrentPosition;
 	}
-	//currentUnitRegion zu finden
 	public ArrayList<Region> findNeighbour(){
 		ArrayList<Region> neighbour=new ArrayList<Region>();
 		for (Unit myUnit : self.getUnits()){			
@@ -127,17 +370,16 @@ public class PathFinder {
 //			}				
 		}
 		return neighbour;
-	}	
-	// Nachbarn der Nachbarn zu finden.
-	public ArrayList<Region> findNeighbour(bwapi.Region r){// TODO
-		ArrayList<Region> neighbour=new ArrayList<Region>();
-		List<bwapi.Region> neighbourRegion=r.getNeighbors();
-		for(Region region:neighbourRegion){
-			neighbour.add(region);
-		}
-//		neighbour=(ArrayList<Region>) neighbourRegion;		
-		return neighbour;
 	}
+//	public ArrayList<Region> findNeighbour(bwapi.Region r){ 
+//		ArrayList<Region> neighbour=new ArrayList<Region>();
+//		List<bwapi.Region> neighbourRegion=r.getNeighbors();
+//		for(Region region:neighbourRegion){
+//			neighbour.add(region);
+//		}
+////		neighbour=(ArrayList<Region>) neighbourRegion;		
+//		return neighbour;
+//	}
 	public ArrayList<Integer> findCost(bwapi.Region region){
 		ArrayList<Integer> cost=new ArrayList<Integer>();
 		ArrayList<Region> neighbour=new ArrayList<Region>();
@@ -172,7 +414,6 @@ public class PathFinder {
 		}			
 		return lowestCost;
 	}
-	//Finden shortest Path
 	public Region findShortestPath(bwapi.Region region){		
 		Region shortest=null;
 		ArrayList<Region> neighbour=new ArrayList<Region>();
@@ -186,7 +427,6 @@ public class PathFinder {
 		}
 		return shortest;		
 	}
-	//Finden Path von start zu target, jedes Mal speichert man nur ein Region.
 	public ArrayList<Region> findShortestPathArray(bwapi.Region startRegion,bwapi.Region targetRegion){
 		
 		if(startRegion==targetRegion){
@@ -204,14 +444,13 @@ public class PathFinder {
 			for(Region r:neighbour){
 				if(lowestCost==(startRegion.getDistance(r)+r.getDistance(targetRegion))){
 					path.add(r);
-					increament++;
+					increment++;
 				}
 			}			
 			return path;
 		}
 		
 	}
-	//suchen die näheste region zu targetRegion
 	public Region findShortestPath(bwapi.Region startRegion,bwapi.Region targetRegion){
 		int lowestCost;
 		Region region=null;
@@ -258,7 +497,92 @@ public class PathFinder {
 //		return x;		
 //	}
 	
+		
 
+	
+	
+	
+//	public  ArrayList<Node> findShortestPath(Node[] nodes, Vector[] vectors, Node target) {
+//	       int[][] Weight = initializeWeight(nodes, vectors);
+//	       int[] D = new int[nodes.length];
+//	       Node[] P = new Node[nodes.length];
+//	       ArrayList<Node> C = new ArrayList<Node>();
+//	       
+//	       
+//	       // initialize:
+//	       // (C)andidate set,
+//	       // (D)yjkstra special path length, and
+//	       // (P)revious Node along shortest path
+//	       for(int i=0; i<nodes.length; i++){
+//	           C.add(nodes[i]);
+//	           D[i] = Weight[0][i];
+//	           if(D[i] != Integer.MAX_VALUE){
+//	               P[i] = nodes[0];
+//	           }
+//	       }
+//	       
+//	       
+//	    // crawl the graph
+//	       for(int i=0; i<nodes.length-1; i++){
+//	           // find the lightest Edge among the candidates
+//	           int l = Integer.MAX_VALUE;
+//	           Node n = nodes[0];
+//	           for(Node j : C){
+//	               if(D[j] < l){
+//	                   n = j;
+//	                   l = D[j];
+//	               }
+//	           }
+//	           C.remove(n);
+//	           
+//	           // see if any Edges from this Node yield a shorter path than from source->that Node
+//	           for(int j=0; j<nodes.length-1; j++){
+//	               if(D[n.name] != Integer.MAX_VALUE && Weight[n.name][j] != Integer.MAX_VALUE && D[n.name]+Weight[n.name][j] < D[j]){
+//	                   // found one, update the path
+//	                   D[j] = D[n.name] + Weight[n.name][j];
+//	                   P[j] = n;
+//	               }
+//	           }
+//	       }
+//	       // we have our path. reuse C as the result list
+//	       C.clear();
+//	       int loc = target.name;
+//	       C.add(target);
+//	       // backtrack from the target by P(revious), adding to the result list
+//	       while(P[loc] != nodes[0]){
+//	           if(P[loc] == null){
+//	               // looks like there's no path from source to target
+//	               return null;
+//	           }
+//	           C.add(0, P[loc]);
+//	           loc = P[loc].name;
+//	       }
+//	       C.add(0, nodes[0]);
+//	       return C;  
+//	}
+//	   private int[][] initializeWeight(Node[] nodes, Vector[] vectors){
+//	       int[][] Weight = new int[nodes.length][nodes.length];
+//	       for(int i=0; i<nodes.length; i++){
+//	           Arrays.fill(Weight[i], Integer.MAX_VALUE);
+//	       }
+//	       for(Vector e : vectors){
+//	           Weight[e.start][e.target] = e.weight;	//Gewicht ist die Länge der Kanten von der startenden Knoten bis Zielknoten.
+//	       }
+//	       return Weight;
+//	   }
+	   
+	   
+	   
+	   
+	   
+	   
+	   
+
+	
+	
+	
+
+	
 	
 	
 	
