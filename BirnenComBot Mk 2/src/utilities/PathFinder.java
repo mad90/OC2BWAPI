@@ -13,6 +13,7 @@ import java.util.List;
 import java.util.HashMap;
 
 
+
 public class PathFinder {
 	public static Game game;
 	public Player self;

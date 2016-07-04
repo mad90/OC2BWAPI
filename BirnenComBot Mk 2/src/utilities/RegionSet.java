@@ -5,6 +5,7 @@ import java.util.ArrayList;
 import bwapi.Game;
 import bwapi.Region;
 
+
 public class RegionSet {
 	
 	private Game game;
